@@ -2,8 +2,7 @@
   <AdminLayout>
     <PageBreadcrumb :pageTitle="currentPageTitle" />
     <div
-      class="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-8"
-    >
+      class="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-8">
       <div class="mb-6">
         <h3 class="font-semibold text-gray-800 text-xl dark:text-white/90">
           Daftar Akun Pengguna (Users)
@@ -21,76 +20,56 @@
         <p>Gagal memuat data: {{ error }}</p>
       </div>
 
-      <div v-else class="overflow-x-auto shadow-md sm:rounded-lg">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-700">
-            <tr>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300"
-              >
-                ID User
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                Nama Karyawan
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300"
-              >
-                Role
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300"
-              >
-                Status
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300"
-              >
-                Tanggal Join
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300"
-              >
-                Aksi
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            <tr v-for="user in userList" :key="user.id_user">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white/90">
-                {{ user.id_user || 'N/A' }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {{ user.nama_karyawan || 'N/A' }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                <span :class="roleClass(user.role)">
-                    {{ user.role || 'Tidak Diketahui' }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                <span :class="statusClass(user.status)">
-                    {{ formatStatus(user.status) }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {{ formatDate(user.tanggal_join) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <button
-                  @click="viewDetail(user)"
-                  class="text-brand-500 hover:text-brand-600 dark:text-brand-400"
-                >
-                  Edit
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div v-if="userList.length === 0" class="text-center py-10 text-gray-500 dark:text-gray-400">
-            Tidak ada data pengguna.
-        </div>
+      <div v-else class="user-management-table">
+        <vue-good-table :columns="columns" :rows="userList" :search-options="{
+          enabled: true,
+          placeholder: 'Cari pengguna...',
+        }" :pagination-options="{
+          enabled: true,
+          mode: 'records',
+          perPage: 10,
+          perPageDropdown: [5, 10, 20, 50],
+          dropdownAllowAll: false,
+          setCurrentPage: 1,
+          nextLabel: 'Next',
+          prevLabel: 'Prev',
+          rowsPerPageLabel: 'Baris per halaman',
+          ofLabel: 'dari',
+          pageLabel: 'halaman',
+        }">
+          <template #table-row="props">
+            <span v-if="props.column.field === 'role'">
+              <span :class="roleClass(props.row.role)">
+                {{ props.row.role || 'Tidak Diketahui' }}
+              </span>
+            </span>
+            <span v-else-if="props.column.field === 'id_user'">
+              <span :class="roleClass(props.row.id_user)">
+                {{ props.row.id_user || 'N/A' }}
+              </span>
+            </span>
+            <span v-else-if="props.column.field === 'status'">
+              <span :class="statusClass(props.row.status)">
+                {{ formatStatus(props.row.status) }}
+              </span>
+            </span>
+            <span v-else-if="props.column.field === 'tanggal_join'">
+              {{ formatDate(props.row.tanggal_join) }}
+            </span>
+            <span v-else-if="props.column.field === 'nama_karyawan'">
+              {{ props.formattedRow['nama_karyawan'] }}
+            </span>
+            <span v-else-if="props.column.field === 'aksi'">
+              <button @click="viewDetail(props.row)"
+                class="text-brand-500 hover:text-brand-600 dark:text-brand-400 font-medium">
+                Edit
+              </button>
+            </span>
+            <span v-else>
+              {{ props.formattedRow[props.column.field] }}
+            </span>
+          </template>
+        </vue-good-table>
       </div>
     </div>
   </AdminLayout>
@@ -101,6 +80,7 @@ import { ref, onMounted } from "vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import axios from 'axios';
+import { VueGoodTable } from 'vue-good-table-next';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -108,6 +88,18 @@ const currentPageTitle = ref("Daftar Pengguna");
 const userList = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
+
+
+const columns = ref([
+  { label: 'ID User', field: 'id_user', width: '300px', sortable: true, hidden: false },
+  // { label: 'Nama Karyawan', field: 'nama_karyawan', sortable: true, filterOptions: { enabled: true } },
+  // { label: 'Role', field: 'role', sortable: true, filterOptions: { enabled: true } },
+  { label: 'Nama Karyawan', field: 'nama_karyawan', width: '250px', sortable: true },
+  { label: 'Role', field: 'role', sortable: true },
+  { label: 'Status', field: 'status', sortable: true },
+  { label: 'Tanggal Join', field: 'tanggal_join', sortable: true },
+  { label: 'Aksi', field: 'aksi', sortable: false },
+]);
 
 
 const formatStatus = (status) => {
@@ -134,25 +126,30 @@ const statusClass = (status) => {
 };
 
 const roleClass = (role) => {
-    const roleMap = {
-        'ketua': 'bg-primary-100 text-primary-800',
-        'bendahara': 'bg-warning-100 text-warning-800',
-        'sekretaris': 'bg-info-100 text-info-800',
-        'karyawan': 'bg-gray-100 text-gray-800',
-    };
-    const baseClass = 'inline-flex items-center rounded px-2 py-0.5 text-xs font-medium';
-    return `${baseClass} ${roleMap[role.toLowerCase()] || 'bg-gray-100 text-gray-800'}`;
+  const roleMap = {
+    'ketua': 'bg-red-800/20 text-red-700',
+    'bendahara': 'bg-yellow-800/20 text-yellow-700',
+    'sekretaris': 'bg-cyan-800/20 text-cyan-700',
+    'karyawan': 'bg-gray-700 text-gray-200',
+    'admin': 'bg-indigo-800/20 text-indigo-700',
+  };
+  const baseClass = 'inline-flex items-center rounded px-2 py-0.5 text-xs font-medium';
+  return `${baseClass} ${roleMap[role.toLowerCase()] || 'bg-gray-100 text-gray-800'}`;
 }
 
 const viewDetail = (user) => {
-  console.log("Edit User:", user.id_user);
-  alert(`Mengedit User: ${user.id_user.substring(0, 8)} (${user.role})`);
+  const userId = user.id_user;
+  if (userId) {
+    window.location.href = `/user-edit/${userId}`;
+  } else {
+    alert('ID User tidak tersedia.');
+  }
 };
 
 const fetchUserList = async () => {
   isLoading.value = true;
   error.value = null;
-  
+
   const userToken = localStorage.getItem('user_token');
 
   if (!userToken) {
@@ -174,15 +171,16 @@ const fetchUserList = async () => {
       axios.get(`${API_BASE_URL}/karyawan/${user.id_karyawan}`, {
         headers: { 'Authorization': `Bearer ${userToken}` }
       })
-      .then(res => {
-        const namaKaryawan = res.data.data.nama_karyawan || 'N/A';
-        return { ...user, nama_karyawan: namaKaryawan };
-      }).catch(() => {
-        return { ...user, nama_karyawan: 'N/A' };
-      })
+        .then(res => {
+          const namaKaryawan = res.data.data.nama_karyawan || 'N/A';
+          let tanggalJoinDate = user.tanggal_join ? new Date(user.tanggal_join) : null;
+          return { ...user, nama_karyawan: namaKaryawan, tanggal_join: tanggalJoinDate };
+        }).catch(() => {
+          return { ...user, nama_karyawan: 'N/A' };
+        })
     );
 
-    userList.value = await Promise.all(userDetailsPromises); 
+    userList.value = await Promise.all(userDetailsPromises);
 
   } catch (err) {
     const axiosError = err;
