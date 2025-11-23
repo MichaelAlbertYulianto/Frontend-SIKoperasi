@@ -140,11 +140,13 @@ const handleSubmit = async () => {
         const userName = username.value
         const userRole = response.data.role  
         const nama_karyawan = getNama.data.data.nama_karyawan
+        const id_user = getNama.data.data.id_user
         
         localStorage.setItem('nama_karyawan', nama_karyawan)
         localStorage.setItem('user_token', userToken)
         localStorage.setItem('user_name', userName)
         localStorage.setItem('user_role', userRole)
+        localStorage.setItem('current_user_id', id_user)
 
         
 
