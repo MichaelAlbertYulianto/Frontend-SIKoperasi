@@ -163,6 +163,7 @@ layer(base);
   --z-index-9999: 9999;
   --z-index-99999: 99999;
   --z-index-999999: 999999;
+  
 }
 
 /*
@@ -761,3 +762,95 @@ span.flatpickr-weekday,
 .edit-button {
   @apply flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 lg:inline-flex lg:w-auto;
 }
+
+.vgt-wrap {
+  border-radius: 1rem !important; /* Contoh: Sudut membulat 1rem (sekitar rounded-xl) */
+  overflow: hidden; /* PENTING: Untuk memotong sudut header/footer yang tidak rounded */
+}
+.vgt-responsive {
+    border-radius: 0; 
+}
+.vgt-responsive:first-child {
+    border-top-left-radius: 1rem !important;
+    border-top-right-radius: 1rem !important;
+}
+.vgt-responsive:last-child {
+    border-bottom-left-radius: 1rem !important;
+    border-bottom-right-radius: 1rem !important;
+}
+
+/* 
+
+body.dark .vgt-wrap,
+.dark .vgt-wrap {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f3f4f6 !important;
+}
+
+body.dark .vgt-table thead th,
+.dark .vgt-table thead th {
+  background-color: #374151 !important; 
+  color: #374151 !important;
+  border-bottom: 1px solid #4b5563 !important; 
+}
+
+
+body.dark .vgt-table tbody tr,
+.dark .vgt-table tbody tr {
+  background-color: #1f2937; 
+}
+
+
+body.dark .vgt-table tbody tr:hover,
+.dark .vgt-table tbody tr:hover {
+  background-color: #374151; 
+}
+
+
+body.dark .vgt-wrap .vgt-responsive,
+.dark .vgt-wrap .vgt-responsive {
+    background-color: #1f2937; 
+}
+
+
+body.dark .vgt-global-search__input,
+body.dark .vgt-table,
+body.dark .vgt-responsive,
+.dark .vgt-global-search__input,
+.dark .vgt-table,
+.dark .vgt-responsive {
+    color: #d1d5db; 
+}
+
+body.dark .vgt-global-search,
+body.dark .vgt-selection-box,
+.dark .vgt-global-search,
+.dark .vgt-selection-box {
+  background-color: #374151 !important; 
+  border-color: #4b5563 !important;     
+}
+
+
+body.dark .vgt-global-search__input,
+.dark .vgt-global-search__input {
+  background-color: #374151 !important; 
+  color: #f3f4f6 !important;            
+  border-color: #4b5563 !important;
+}
+
+body.dark .vgt-rows-per-page-select,
+body.dark .vgt-page-dropdown,
+.dark .vgt-rows-per-page-select,
+.dark .vgt-page-dropdown {
+  background-color: #374151 !important; 
+  color: #f3f4f6 !important;
+  border-color: #4b5563 !important;
+}
+
+body.dark .vgt-wrap button,
+.dark .vgt-wrap button {
+    background-color: #4b5563; 
+    color: #f3f4f6;
+    border-color: #4b5563;
+} */
