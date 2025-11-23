@@ -52,6 +52,10 @@
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
                                 Aksi
                             </th>
+                            <th v-if="showApprovalColumn"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                                Persetujuan Saya
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -73,7 +77,12 @@
                                 {{ formatDate(pinjaman.tanggal_pengajuan) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span :class="statusClass(pinjaman.status_pinjaman)">
+                                <span v-if="pinjaman.status_pinjaman === 'menunggu_persetujuan'"
+                                    :class="statusClass('menunggu_persetujuan')">
+                                    Menunggu Persetujuan Pengurus Lain
+                                </span>
+
+                                <span v-else :class="statusClass(pinjaman.status_pinjaman)">
                                     {{ formatStatus(pinjaman.status_pinjaman) }}
                                 </span>
                             </td>
@@ -82,6 +91,20 @@
                                     class="text-brand-500 hover:text-brand-600 dark:text-brand-400">
                                     Lihat Detail
                                 </button>
+                            </td>
+                            <td v-if="showApprovalColumn" class="px-6 py-4 whitespace-nowrap">
+                                <span v-if="pinjaman.my_approval_status === 'disetujui'"
+                                    :class="statusClass('disetujui')">
+                                    DISETUJUI
+                                </span>
+                                <span v-else-if="pinjaman.my_approval_status === 'ditolak'"
+                                    :class="statusClass('ditolak')">
+                                    DITOLAK
+                                </span>
+                                <span v-else-if="pinjaman.is_my_turn" class="flex gap-2"
+                                    :class="statusClass('menunggu_persetujuan')">
+                                    Menunggu Persetujuan
+                                </span>
                             </td>
                         </tr>
                     </tbody>
@@ -96,7 +119,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import axios from 'axios';
@@ -106,7 +129,29 @@ const pinjamanList = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 
+const currentUserRole = ref(localStorage.getItem('user_role')?.toLowerCase());
+const currentUserId = ref(localStorage.getItem('current_user_id'));
 
+console.log(currentUserRole.value, currentUserId.value);
+
+const getMyApprovalStatus = (persetujuanList, userRole, userId) => {
+    if (!persetujuanList || !userRole) {
+        return { status: 'N/A', myTurn: false };
+
+    }
+
+    const myApproval = persetujuanList.find(p => p.tahap_persetujuan.toLowerCase() === userRole);
+    console.log('My Approval:', myApproval);
+
+    if (myApproval) {
+        return {
+            status: myApproval.status,
+            myTurn: myApproval.status === 'menunggu' && myApproval.id_user === userId,
+        };
+    }
+
+    return { status: 'N/A', myTurn: false };
+};
 
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('id-ID', {
@@ -149,7 +194,6 @@ const viewDetail = (pinjaman) => {
 const fetchPendingPinjaman = async () => {
     isLoading.value = true;
     error.value = null;
-
     const userToken = localStorage.getItem('user_token');
 
     if (!userToken) {
@@ -166,17 +210,27 @@ const fetchPendingPinjaman = async () => {
         });
 
         let pendingPinjaman = response.data.data;
-        const userLooksups = pendingPinjaman.map(pinjaman =>
-            axios.get(`${API_BASE_URL}/karyawan/${pinjaman.id_karyawan}`, {
+        const userLooksups = pendingPinjaman.map(async pinjaman => {
+
+            const employeePromise = axios.get(`${API_BASE_URL}/karyawan/${pinjaman.id_karyawan}`, {
                 headers: { 'Authorization': `Bearer ${userToken}` }
-            })
-            .then(res => {
-                const namaKaryawan = res.data.data.nama_karyawan || 'N/A';
-                return { ...pinjaman, nama_karyawan: namaKaryawan };
-            }).catch(() => {
-                return { ...pinjaman, nama_karyawan: 'N/A' };
-            })
-        );
+            }).then(res => res.data.data.nama_karyawan).catch(() => 'N/A');
+
+            const employeeName = await employeePromise;
+
+            const myApproval = getMyApprovalStatus(
+                pinjaman.persetujuan,
+                currentUserRole.value,
+                currentUserId.value
+            );
+
+            return {
+                ...pinjaman,
+                nama_karyawan: employeeName,
+                my_approval_status: myApproval.status,
+                is_my_turn: myApproval.myTurn
+            };
+        });
 
         const enrichedPinjamanList = await Promise.all(userLooksups);
 
@@ -195,6 +249,13 @@ const fetchPendingPinjaman = async () => {
         isLoading.value = false;
     }
 };
+
+const showApprovalColumn = computed(() => {
+    const roles = ['ketua', 'bendahara', 'sekretaris'];
+    return roles.includes(currentUserRole.value);
+});
+
+
 
 onMounted(() => {
     fetchPendingPinjaman();
