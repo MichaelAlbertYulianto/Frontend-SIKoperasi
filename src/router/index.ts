@@ -16,12 +16,13 @@ const router = createRouter({
       },
     },
     {
-      path : '/',
+      path: '/dashboard',
       name: 'Dashboard',
       component: () => import('../views/Ecommerce.vue'),
       meta: {
         title: 'Dashboard',
         requiresAuth: true,
+        roles: ['admin', 'ketua', 'sekretaris', 'bendahara', 'karyawan'],
       },
     },
     {
@@ -161,6 +162,7 @@ const router = createRouter({
       meta: {
         title: 'Pendingan Pinjaman',
         requiresAuth: true,
+        roles: ['admin', 'ketua', 'sekretaris', 'bendahara'],
       },
     },
     {
@@ -170,6 +172,27 @@ const router = createRouter({
       meta: {
         title: 'Users Management',
         requiresAuth: true,
+        roles: ['admin'],
+      },
+    },
+    {
+      path: '/user-edit/:id',
+      name: 'User Edit',
+      component: () => import('../views/Pages/UserEditPage.vue'),
+      meta: {
+        title: 'User Edit',
+        requiresAuth: true,
+        roles: ['admin'],
+      },
+    },
+    {
+      path: '/log',
+      name: 'Log',
+      component: () => import('../views/Pages/Log.vue'),
+      meta: {
+        title: 'Log',
+        requiresAuth: true,
+        roles: ['admin'],
       },
     },
 
@@ -198,14 +221,27 @@ router.beforeEach((to, from, next) => {
   document.title = `${to.meta.title} | Sistem Informasi Koperasi Simpanan dan Pinjaman Central Sakti`
 
   const isAuthenticated = !!localStorage.getItem('user_token')
+  const userRole = localStorage.getItem('user_role')
+  const requiredAuth = to.meta.requiresAuth
+  const requiredRoles = to.meta.roles
 
-  if (to.meta.requiresAuth && !isAuthenticated) {
+  if (requiredAuth && !isAuthenticated) {
     next({ name: 'SignIn' })
     return
-  } else if (!to.meta.requiresAuth && isAuthenticated) {
-    next({ name: 'Dashboard' })
-    return
   }
+
+  if (requiredAuth && Array.isArray(requiredRoles) && requiredRoles.length > 0) {
+    if (userRole && !requiredRoles.includes(userRole)) {
+
+      next({ name: 'Dashboard' })
+      return
+    }
+  }
+
+  if (!requiredAuth && isAuthenticated) {
+        next({ name: 'Dashboard' })
+        return
+    }
 
   next()
 })

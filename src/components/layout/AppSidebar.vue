@@ -50,7 +50,7 @@
     >
       <nav class="mb-6">
         <div class="flex flex-col gap-4">
-          <div v-for="(menuGroup, groupIndex) in menuGroups" :key="groupIndex">
+          <div v-for="(menuGroup, groupIndex) in filteredMenuGroups" :key="groupIndex">
             <h2
               :class="[
                 'mb-4 text-xs uppercase flex leading-[20px] text-gray-400',
@@ -236,12 +236,16 @@ import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
 import { useSidebar } from "@/composables/useSidebar";
 
 const route = useRoute();
+const userRole = computed(() => {
+    const role = localStorage.getItem('user_role');
+    return role ? role.toLowerCase() : 'guest';
+});
 
 const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar();
 
 const menuGroups = [
   {
-    title: "Menu",
+    title: "Menu Pengurus",
     items: [
       {
         icon: GridIcon,
@@ -253,79 +257,47 @@ const menuGroups = [
         name: "Pendingan Pinjaman",
         path: "/pendingan-pinjaman",
       },
+    ],
+  },
+  {
+    title: "Administration",
+    items: [
       {
         icon: UserGroupIcon,
         name: "Users Management",
         path: "/users-management",
       },
-      // {
-      //   icon: CalenderIcon,
-      //   name: "Calendar",
-      //   path: "/calendar",
-      // },
-      // {
-      //   icon: UserCircleIcon,
-      //   name: "User Profile",
-      //   path: "/profile",
-      // },
-
-      // {
-      //   name: "Forms",
-      //   icon: ListIcon,
-      //   subItems: [
-      //     { name: "Form Elements", path: "/form-elements", pro: false },
-      //   ],
-      // },
-      // {
-      //   name: "Tables",
-      //   icon: TableIcon,
-      //   subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
-      // },
-      // {
-      //   name: "Pages",
-      //   icon: PageIcon,
-      //   subItems: [
-      //     { name: "Black Page", path: "/blank", pro: false },
-      //     { name: "404 Page", path: "/error-404", pro: false },
-      //   ],
-      // },
-    ],
+      {
+        icon: DocsIcon,
+        name: "Log",
+        path: "/log",
+      },
+    ]
   },
-  // {
-  //   title: "User Management",
-  //   items: [
-  //     {
-  //       icon: PieChartIcon,
-  //       name: "Charts",
-  //       subItems: [
-  //         { name: "Line Chart", path: "/line-chart", pro: false },
-  //         { name: "Bar Chart", path: "/bar-chart", pro: false },
-  //       ],
-  //     },
-  //     {
-  //       icon: BoxCubeIcon,
-  //       name: "Ui Elements",
-  //       subItems: [
-  //         { name: "Alerts", path: "/alerts", pro: false },
-  //         { name: "Avatars", path: "/avatars", pro: false },
-  //         { name: "Badge", path: "/badge", pro: false },
-  //         { name: "Buttons", path: "/buttons", pro: false },
-  //         { name: "Images", path: "/images", pro: false },
-  //         { name: "Videos", path: "/videos", pro: false },
-  //       ],
-  //     },
-  //     {
-  //       icon: PlugInIcon,
-  //       name: "Authentication",
-  //       subItems: [
-  //         { name: "Signin", path: "/signin", pro: false },
-  //         { name: "Signup", path: "/signup", pro: false },
-  //       ],
-  //     },
-  //     // ... Add other menu items here
-  //   ],
-  // },
 ];
+
+const isAllowed = (role, allowedRoles) => allowedRoles.includes(role);
+const filteredMenuGroups = computed(() => {
+    return menuGroups
+        .map(group => {
+            let isGroupVisible = false;
+
+            if (group.title === "Menu Pengurus") {
+                const allowed = ['ketua', 'bendahara', 'sekretaris', 'admin'];
+                isGroupVisible = isAllowed(userRole.value, allowed);
+            } else if (group.title === "Administration") {
+                const allowed = ['admin'];
+                isGroupVisible = isAllowed(userRole.value, allowed);
+            }
+
+            if (!isGroupVisible) {
+                return null;
+            }
+
+            return group;
+        })
+        .filter(group => group !== null);
+});
 
 const isActive = (path) => route.path === path;
 
@@ -342,6 +314,7 @@ const isAnySubmenuRouteActive = computed(() => {
     )
   );
 });
+
 
 const isSubmenuOpen = (groupIndex, itemIndex) => {
   const key = `${groupIndex}-${itemIndex}`;
