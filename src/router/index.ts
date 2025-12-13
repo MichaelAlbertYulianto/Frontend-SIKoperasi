@@ -7,6 +7,16 @@ const router = createRouter({
   },
   routes: [
     {
+      path: '/',
+      name: 'Root',
+      component: () => import('../views/Ecommerce.vue'),
+      meta: {
+        title: 'Welcome',
+        requiresAuth: true,
+        roles: ['admin', 'ketua', 'sekretaris', 'bendahara', 'karyawan'],
+      },
+    },
+    {
       path: '/signin',
       name: 'SignIn',
       component: () => import('../views/Auth/Signin.vue'),
@@ -22,7 +32,7 @@ const router = createRouter({
       meta: {
         title: 'Dashboard',
         requiresAuth: true,
-        roles: ['admin', 'ketua', 'sekretaris', 'bendahara', 'karyawan'],
+        roles: ['admin', 'ketua', 'sekretaris', 'bendahara'],
       },
     },
     {
@@ -154,6 +164,14 @@ const router = createRouter({
         requiresAuth: false,
       },
     },
+    {
+      path: '/:catchAll(.*)',
+      redirect: { name: '404 Error' },
+      meta: {
+        title: '404 Not Found',
+        requiresAuth: false,
+      },
+    },
 
     {
       path: '/pendingan-pinjaman',
@@ -195,6 +213,56 @@ const router = createRouter({
         roles: ['admin'],
       },
     },
+    {
+      path: '/detail-pinjaman/:id',
+      name: 'Detail Pinjaman',
+      component: () => import('../views/Pages/DetailPinjaman.vue'),
+      meta: {
+        title: 'Detail Pinjaman',
+        requiresAuth: true,
+        roles: ['admin', 'ketua', 'sekretaris', 'bendahara', 'karyawan'],
+      },
+    },
+    {
+      path: '/history-pinjaman',
+      name: 'History Pinjaman',
+      component: () => import('../views/Pages/HistoryPinjaman.vue'),
+      meta: {
+        title: 'History Pinjaman',
+        requiresAuth: true,
+        roles: ['admin', 'ketua', 'sekretaris', 'bendahara'],
+      },
+    },
+    {
+      path: '/homepage',
+      name: 'Homepage',
+      component: () => import('../views/Pages/HomePageKaryawan.vue'),
+      meta: {
+        title: 'Homepage',
+        requiresAuth: true,
+        roles: ['karyawan'],
+      },
+    },
+    {
+      path: '/pengajuan-pinjaman',
+      name: 'Pengajuan Pinjaman',
+      component: () => import('../views/Pages/PengajuanPinjaman.vue'),
+      meta: {
+        title: 'Pengajuan Pinjaman',
+        requiresAuth: true,
+        roles: ['karyawan'],
+      },
+    },
+    {
+      path: '/pencairan-pinjaman',
+      name: 'Pencairan Pinjaman',
+      component: () => import('../views/Pages/PencairanPinjaman.vue'),
+      meta: {
+        title: 'Pencairan Pinjaman',
+        requiresAuth: true,
+        roles: ['bendahara', 'admin'],
+      },
+    },
 
     // {
     //   path: '/signin',
@@ -221,27 +289,53 @@ router.beforeEach((to, from, next) => {
   document.title = `${to.meta.title} | Sistem Informasi Koperasi Simpanan dan Pinjaman Central Sakti`
 
   const isAuthenticated = !!localStorage.getItem('user_token')
-  const userRole = localStorage.getItem('user_role')
+  const rawUserRole = localStorage.getItem('user_role')
+  const userRole = rawUserRole ? rawUserRole.toLowerCase() : null
+
   const requiredAuth = to.meta.requiresAuth
-  const requiredRoles = to.meta.roles
+  const requiredRoles = Array.isArray(to.meta.roles) ? to.meta.roles : []
 
   if (requiredAuth && !isAuthenticated) {
     next({ name: 'SignIn' })
     return
   }
 
-  if (requiredAuth && Array.isArray(requiredRoles) && requiredRoles.length > 0) {
-    if (userRole && !requiredRoles.includes(userRole)) {
+  if (!requiredAuth && isAuthenticated) {
+    const isAuthRoute = to.name === 'SignIn' || to.name === 'Signup'
 
-      next({ name: 'Dashboard' })
+    if (isAuthRoute) {
+      if (userRole === 'karyawan') {
+        next({ name: 'Homepage' })
+      } else {
+        next({ name: 'Dashboard' })
+      }
       return
     }
   }
 
-  if (!requiredAuth && isAuthenticated) {
-        next({ name: 'Dashboard' })
-        return
+  const targetIsRoot = to.path === '/' 
+  const targetHasNoRoles = requiredAuth && requiredRoles.length === 0 
+
+  const defaultHome = userRole === 'karyawan' ? 'Homepage' : 'Dashboard'
+
+  if (targetIsRoot || targetHasNoRoles) {
+    if (to.name !== defaultHome) {
+      next({ name: defaultHome })
+      return
     }
+  }
+
+  if (requiredAuth && requiredRoles.length > 0) {
+    if (userRole === 'karyawan') {
+      if (!requiredRoles.includes('karyawan')) {
+        next({ name: '404 Error' })
+        return
+      }
+    } else if (userRole && !requiredRoles.includes(userRole)) {
+      next({ name: '404 Error' })
+      return
+    }
+  }
 
   next()
 })
