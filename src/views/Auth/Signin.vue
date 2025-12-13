@@ -100,10 +100,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios, { AxiosError } from 'axios' // ⬅️ Import Axios dan AxiosError
+import axios, { AxiosError } from 'axios' 
 import FullScreenLayout from '@/components/layout/FullScreenLayout.vue'
+import Swal from 'sweetalert2'
 
-// Ambil Base URL dari file .env
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 const router = useRouter()
 
@@ -135,7 +135,6 @@ const handleSubmit = async () => {
                 'Authorization': `Bearer ${response.data.user_token}`
             }
         })
-        console.log(getNama)
         const userToken = response.data.user_token
         const userName = username.value
         const userRole = response.data.role  
@@ -149,9 +148,13 @@ const handleSubmit = async () => {
         localStorage.setItem('current_user_id', id_user)
 
         
-
-
-        router.push('/dashboard') 
+        if (userRole === 'admin' || userRole === 'ketua' || userRole === 'sekretaris' || userRole === 'bendahara') {
+            router.push('/dashboard') 
+            return
+        } else {
+            router.push('/homepage') 
+            return
+        }
 
     } catch (error) {
         let errorMessage = 'Terjadi kesalahan jaringan atau server.'
@@ -181,7 +184,11 @@ const handleSubmit = async () => {
             console.error('Login Gagal (Unknown Error):', error)
         }
         
-        alert(`Login Gagal: ${errorMessage}`)
+        Swal.fire({
+            icon: 'error',
+            title: 'Login Gagal',
+            text: errorMessage,
+        })
     }
 }
 </script>
