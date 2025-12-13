@@ -234,6 +234,11 @@ import {
 import SidebarWidget from "./SidebarWidget.vue";
 import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
 import { useSidebar } from "@/composables/useSidebar";
+import MenuIcon from "@/icons/MenuIcon.vue";
+import ArchiveIcon from "@/icons/ArchiveIcon.vue";
+import HomePageIcon from "@/icons/HomePageIcon.vue";
+import AjukanPinjamanIcon from "@/icons/AjukanPinjamanIcon.vue";
+
 
 const route = useRoute();
 const userRole = computed(() => {
@@ -257,7 +262,22 @@ const menuGroups = [
         name: "Pendingan Pinjaman",
         path: "/pendingan-pinjaman",
       },
+      {
+        icon: CalenderIcon,
+        name: "History Pinjaman",
+        path: "/history-pinjaman",
+      }
     ],
+  },
+  {
+    title: "Pencairan & Pelunasan",
+    items: [
+      {
+        icon: ArchiveIcon,
+        name: "Pencairan Pinjaman",
+        path: "/pencairan-pinjaman",
+      },
+    ]
   },
   {
     title: "Administration",
@@ -274,6 +294,21 @@ const menuGroups = [
       },
     ]
   },
+  {
+    title: "Karyawan Menu",
+    items: [
+      {
+        icon: HomePageIcon,
+        name: "Homepage",
+        path: "/homepage",
+      },
+      {
+        icon: AjukanPinjamanIcon,
+        name: "Ajukan Pinjaman",
+        path: "/pengajuan-pinjaman",
+      }
+    ]
+  }
 ];
 
 const isAllowed = (role, allowedRoles) => allowedRoles.includes(role);
@@ -287,6 +322,12 @@ const filteredMenuGroups = computed(() => {
                 isGroupVisible = isAllowed(userRole.value, allowed);
             } else if (group.title === "Administration") {
                 const allowed = ['admin'];
+                isGroupVisible = isAllowed(userRole.value, allowed);
+            } else if (group.title === "Karyawan Menu") {
+                const allowed = ['karyawan'];
+                isGroupVisible = isAllowed(userRole.value, allowed);
+            } else if (group.title === "Pencairan & Pelunasan") {
+                const allowed = ['bendahara'];
                 isGroupVisible = isAllowed(userRole.value, allowed);
             }
 
