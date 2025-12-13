@@ -78,7 +78,6 @@ const signOut = () => {
   localStorage.removeItem('nama_karyawan')
   localStorage.removeItem('current_user_id')
 
-  console.log('User signed out.')
   router.push('/signin')
   closeDropdown()
 }
