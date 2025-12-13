@@ -21,94 +21,74 @@
             </div>
 
             <div v-else class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                Nama Karyawan
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                Jumlah
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                Tenor
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                Tujuan
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                Pengajuan
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                Status
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                Aksi
-                            </th>
-                            <th v-if="showApprovalColumn"
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                                Persetujuan Saya
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                        <tr v-for="pinjaman in pinjamanList" :key="pinjaman.id_pinjaman">
-                            <td
-                                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white/90">
-                                {{ pinjaman.nama_karyawan || 'N/A' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                {{ formatCurrency(pinjaman.jumlah_pinjaman) }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                {{ pinjaman.tenor }} bulan
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
-                                {{ pinjaman.tujuan_pinjaman }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                {{ formatDate(pinjaman.tanggal_pengajuan) }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span v-if="pinjaman.status_pinjaman === 'menunggu_persetujuan'"
-                                    :class="statusClass('menunggu_persetujuan')">
-                                    Menunggu Persetujuan Pengurus Lain
-                                </span>
+                <div v-if="pinjamanList.length > 0" class="mb-4 text-sm text-gray-500 dark:text-gray-400">
+                    <p>
+                        <strong>Catatan:</strong> "Menunggu Persetujuan Anda" berarti pengajuan pinjaman ini
+                        menunggu persetujuan Anda sebagai {{ currentUserRole.charAt(0).toUpperCase() +
+                            currentUserRole.slice(1) }}.
+                    </p>
+                    <vue-good-table :columns="columns" :rows="pinjamanList"
+                        :search-options="{ enabled: true, placeholder: 'Cari nama, jumlah, atau tujuan...' }"
+                        :sort-options="{
+                            enabled: true,
+                            initialSortBy: { field: 'tanggal_pengajuan', type: 'desc' },
+                        }"
+                        :pagination-options="{
+                            enabled: true,
+                            mode: 'records',
+                            perPage: 10,
+                            perPageDropdown: [10, 20, 50],
+                        }">
+                        <template #table-row="props">
+                            <span v-if="props.column.field === 'nama_karyawan'">
+                                {{ props.row.nama_karyawan || 'N/A' }}
+                            </span>
 
-                                <span v-else :class="statusClass(pinjaman.status_pinjaman)">
-                                    {{ formatStatus(pinjaman.status_pinjaman) }}
+                            <span v-else-if="props.column.field === 'jumlah_pinjaman'">
+                                {{ formatCurrency(props.row.jumlah_pinjaman) }}
+                            </span>
+
+                            <span v-else-if="props.column.field === 'tenor'">
+                                {{ props.row.tenor }} bulan
+                            </span>
+
+                            <span v-else-if="props.column.field === 'tanggal_pengajuan'">
+                                {{ formatDate(props.row.tanggal_pengajuan) }}
+                            </span>
+
+                            <span v-else-if="props.column.field === 'status_pinjaman'">
+                                <span
+                                    v-if="props.row.status_pinjaman === 'menunggu_persetujuan' && props.row.is_my_turn"
+                                    :class="statusClass('menunggu_persetujuan_anda')">
+                                    Menunggu Persetujuan Anda
                                 </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <button @click="viewDetail(pinjaman)"
-                                    class="text-brand-500 hover:text-brand-600 dark:text-brand-400">
+                                <span v-else-if="props.row.status_pinjaman === 'menunggu_persetujuan'"
+                                    :class="statusClass('menunggu_persetujuan')">
+
+                                    Menunggu {{
+                                        props.row.next_role && props.row.next_role !== 'N/A'
+                                            ? (props.row.next_role.charAt(0).toUpperCase() + props.row.next_role.slice(1))
+                                    : 'Pengurus Lain'
+                                    }}
+                                </span>
+                                <span v-else :class="statusClass(props.row.status_pinjaman)">
+                                    {{ formatStatus(props.row.status_pinjaman) }}
+                                </span>
+                            </span>
+
+                            <span v-else-if="props.column.field === 'aksi'">
+                                <button @click="viewDetail(props.row)"
+                                    class="text-brand-500 hover:text-brand-600 dark:text-brand-400 font-medium">
                                     Lihat Detail
                                 </button>
-                            </td>
-                            <td v-if="showApprovalColumn" class="px-6 py-4 whitespace-nowrap">
-                                <span v-if="pinjaman.my_approval_status === 'disetujui'"
-                                    :class="statusClass('disetujui')">
-                                    DISETUJUI
-                                </span>
-                                <span v-else-if="pinjaman.my_approval_status === 'ditolak'"
-                                    :class="statusClass('ditolak')">
-                                    DITOLAK
-                                </span>
-                                <span v-else-if="pinjaman.is_my_turn" class="flex gap-2"
-                                    :class="statusClass('menunggu_persetujuan')">
-                                    Menunggu Persetujuan
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </span>
+
+                            <span v-else>
+                                {{ props.formattedRow[props.column.field] }}
+                            </span>
+                        </template>
+                    </vue-good-table>
+                </div>
 
                 <div v-if="pinjamanList.length === 0" class="text-center py-10 text-gray-500 dark:text-gray-400">
                     Tidak ada pinjaman yang menunggu persetujuan.
@@ -123,6 +103,8 @@ import { ref, onMounted, computed } from "vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import axios from 'axios';
+import Swal from "sweetalert2";
+import { VueGoodTable } from "vue-good-table-next";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const pinjamanList = ref([]);
@@ -132,25 +114,59 @@ const error = ref(null);
 const currentUserRole = ref(localStorage.getItem('user_role')?.toLowerCase());
 const currentUserId = ref(localStorage.getItem('current_user_id'));
 
-console.log(currentUserRole.value, currentUserId.value);
+const APPROVAL_ORDER = ['sekretaris', 'bendahara', 'ketua'];
+
+const columns = ref([
+    { label: 'Nama Karyawan', field: 'nama_karyawan', sortable: true },
+    { label: 'Jumlah', field: 'jumlah_pinjaman', sortable: true, type: 'number' },
+    { label: 'Tenor', field: 'tenor', sortable: true, type: 'number' },
+    { label: 'Tujuan', field: 'tujuan_pinjaman', sortable: true },
+    { label: 'Pengajuan', field: 'tanggal_pengajuan', sortable: true },
+    { label: 'Status', field: 'status_pinjaman', sortable: true },
+    { label: 'Aksi', field: 'aksi', sortable: false },
+]);
+
 
 const getMyApprovalStatus = (persetujuanList, userRole, userId) => {
     if (!persetujuanList || !userRole) {
-        return { status: 'N/A', myTurn: false };
-
+        return { status: 'N/A', myTurn: false, nextRole: 'N/A' };
     }
 
-    const myApproval = persetujuanList.find(p => p.tahap_persetujuan.toLowerCase() === userRole);
-    console.log('My Approval:', myApproval);
+    let nextRoleToApprove = 'N/A';
+    let myApproval = null;
+    let isMyTurn = false;
 
-    if (myApproval) {
-        return {
-            status: myApproval.status,
-            myTurn: myApproval.status === 'menunggu' && myApproval.id_user === userId,
-        };
+
+for (const role of APPROVAL_ORDER) {
+        const approvalEntry = persetujuanList.find(p => p.tahap_persetujuan.toLowerCase() === role);
+        
+        if (approvalEntry) {
+            
+            if (approvalEntry.status === 'menunggu') {
+                nextRoleToApprove = role; 
+
+                if (role === userRole && approvalEntry.id_user === userId) {
+                    isMyTurn = true;
+                }
+                break; 
+            }
+            
+            if (approvalEntry.status === 'ditolak') {
+                nextRoleToApprove = 'DITOLAK_FINAL'; 
+                break; 
+            }
+        }
     }
 
-    return { status: 'N/A', myTurn: false };
+    myApproval = persetujuanList.find(p => p.tahap_persetujuan.toLowerCase() === userRole);
+    const myStatus = myApproval ? myApproval.status : 'N/A';
+
+
+    return {
+        status: myStatus,
+        myTurn: isMyTurn,
+        nextRole: nextRoleToApprove
+    };
 };
 
 const formatCurrency = (value) => {
@@ -178,7 +194,7 @@ const statusClass = (status) => {
     switch (status) {
         case 'disetujui':
             return 'inline-flex items-center rounded-full bg-success-100 px-2 py-0.5 text-xs font-medium text-success-800 dark:bg-success-800/20 dark:text-success-500';
-        case 'ditolak':
+        case 'menunggu_persetujuan_anda':
             return 'inline-flex items-center rounded-full bg-error-100 px-2 py-0.5 text-xs font-medium text-error-800 dark:bg-error-800/20 dark:text-error-500';
         case 'menunggu_persetujuan':
         default:
@@ -187,8 +203,12 @@ const statusClass = (status) => {
 };
 
 const viewDetail = (pinjaman) => {
-    console.log("Lihat Detail Pinjaman:", pinjaman.id_pinjaman);
-    alert(`Detail Pinjaman ${pinjaman.id_pinjaman.substring(0, 8)}: ${pinjaman.tujuan_pinjaman}`);
+    const pinjamanId = pinjaman.id_pinjaman;
+    if (pinjamanId) {
+        window.location.href = `/detail-pinjaman/${pinjamanId}`;
+    } else {
+        Swal.fire('Error', 'ID Pinjaman tidak tersedia.', 'error');
+    }
 };
 
 const fetchPendingPinjaman = async () => {
@@ -218,7 +238,7 @@ const fetchPendingPinjaman = async () => {
 
             const employeeName = await employeePromise;
 
-            const myApproval = getMyApprovalStatus(
+            const approvalDetails = getMyApprovalStatus(
                 pinjaman.persetujuan,
                 currentUserRole.value,
                 currentUserId.value
@@ -227,8 +247,9 @@ const fetchPendingPinjaman = async () => {
             return {
                 ...pinjaman,
                 nama_karyawan: employeeName,
-                my_approval_status: myApproval.status,
-                is_my_turn: myApproval.myTurn
+                my_approval_status: approvalDetails.status,
+                is_my_turn: approvalDetails.myTurn,
+                next_role: approvalDetails.nextRole
             };
         });
 
