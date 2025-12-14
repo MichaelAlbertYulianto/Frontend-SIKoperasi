@@ -29,10 +29,9 @@
                             mode: 'records',
                             perPage: 10,
                             perPageDropdown: [10, 20, 50],
-                        }"
-                        :sort-options="{ 
+                        }" :sort-options="{
                             enabled: true,
-                            initialSortBy: { field: 'tanggal_persetujuan', type: 'desc' } 
+                            initialSortBy: { field: 'tanggal_persetujuan', type: 'desc' }
                         }">
 
                         <template #table-row="props">
@@ -55,8 +54,7 @@
                             </span>
 
                             <span v-else-if="props.column.field === 'aksi'">
-                                <button v-if="canDisburse" 
-                                    @click="openDisburseModal(props.row)"
+                                <button v-if="canDisburse" @click="openDisburseModal(props.row)"
                                     class="px-3 py-1 text-sm font-medium text-white transition rounded-lg bg-brand-500 hover:bg-brand-600">
                                     Cairkan Sekarang
                                 </button>
@@ -142,7 +140,7 @@ const statusClass = (status) => {
             return 'inline-flex items-center rounded-full bg-success-100 px-2 py-0.5 text-xs font-medium text-success-800 dark:bg-success-800/20 dark:text-success-500';
         case 'dicairkan':
             return 'inline-flex items-center rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-800/20 dark:text-primary-500';
-        default: 
+        default:
             return 'inline-flex items-center rounded-full bg-warning-100 px-2 py-0.5 text-xs font-medium text-warning-800 dark:bg-warning-800/20 dark:text-warning-500';
     }
 };
@@ -164,6 +162,7 @@ const fetchUserDetail = async (userId) => {
 
 
 const openDisburseModal = async (pinjaman) => {
+    await navigator.clipboard.writeText(pinjaman.rekening_bank);
     const result = await Swal.fire({
         title: 'Verifikasi Pencairan',
         html: `
@@ -172,7 +171,13 @@ const openDisburseModal = async (pinjaman) => {
                 <p class="text-sm"><strong>Nama Karyawan:</strong> ${pinjaman.nama_karyawan}</p>
                 <p class="text-sm"><strong>Jumlah Cair:</strong> <span class="text-xl font-bold text-brand-600">${formatCurrency(pinjaman.jumlah_pinjaman)}</span></p>
                 <p class="text-sm"><strong>Nama Bank:</strong> ${pinjaman.nama_bank}</p>
-                <p class="text-sm"><strong>Nomor Rekening:</strong> <span class="font-mono bg-yellow-100 p-1 rounded">${pinjaman.rekening_bank}</span></p>
+                <p class="text-sm">
+                    <strong>Nomor Rekening:</strong>
+                    <span class="font-mono bg-yellow-100 p-1 rounded">${pinjaman.rekening_bank}</span>                    
+                <span class="ml-2 text-xs text-gray-500">
+                    Nomor rekening telah disalin ke clipboard.
+                </span>
+                </p> 
             </div>
             <p class="text-sm text-gray-500 mt-4">Klik 'Lanjutkan Pencairan' setelah memverifikasi detail rekening dan melakukan transfer dana.</p>
         `,
@@ -197,7 +202,7 @@ const disburseLoan = async (pinjamanId) => {
 
         Swal.fire('Berhasil!', 'Pinjaman berhasil dicairkan. Status telah diperbarui.', 'success');
 
-        await fetchDisbursablePinjaman(); 
+        await fetchDisbursablePinjaman();
 
     } catch (err) {
         const message = err.response?.data?.message || 'Gagal mencairkan pinjaman. Silakan coba lagi.';
@@ -225,17 +230,17 @@ const fetchDisbursablePinjaman = async () => {
         const rawPinjamanData = response.data.data;
 
         const processedPinjamanPromises = rawPinjamanData.map(async pinjaman => {
-            
-            const userId = pinjaman.id_user; 
-            
-            let userDetails = { 
-                rekening_bank: 'N/A', 
+
+            const userId = pinjaman.id_user;
+
+            let userDetails = {
+                rekening_bank: 'N/A',
                 nama_bank: 'N/A',
-                nama_karyawan: 'N/A' 
+                nama_karyawan: 'N/A'
             };
 
             if (userId) {
-                 try {
+                try {
                     const userRes = await axios.get(`${API_BASE_URL}/user/${userId}`, {
                         headers: { 'Authorization': `Bearer ${userToken}` }
                     });
@@ -246,17 +251,17 @@ const fetchDisbursablePinjaman = async () => {
                         nama_bank: userData.nama_bank || 'N/A',
                         nama_karyawan: userData.nama_karyawan || 'N/A'
                     };
-                 } catch(e) {
-                     console.error(`User detail lookup failed for ID ${userId}`, e);
-                 }
+                } catch (e) {
+                    console.error(`User detail lookup failed for ID ${userId}`, e);
+                }
             }
 
             return {
                 ...pinjaman,
-                ...userDetails, 
+                ...userDetails,
             };
         });
-        
+
         const enrichedPinjamanList = await Promise.all(processedPinjamanPromises);
 
         pinjamanList.value = enrichedPinjamanList.filter(p => p.status_pinjaman === 'disetujui');
@@ -278,7 +283,7 @@ const finalConfirmDisburse = async (pinjaman) => {
         showCancelButton: true,
         confirmButtonText: 'Ya, Status Dicairkan!',
         cancelButtonText: 'Tinjau Lagi',
-        confirmButtonColor: '#10B981', 
+        confirmButtonColor: '#10B981',
         cancelButtonColor: '#3085d6',
     });
 
