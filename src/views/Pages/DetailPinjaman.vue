@@ -79,18 +79,23 @@
             </div>
           </div>
 
-          <div v-if="!isKaryawan" class="p-6 border rounded-lg dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div v-if="!isKaryawan && isWaitingApproval" class="p-6 border rounded-lg dark:border-gray-700 bg-white dark:bg-gray-800">
             <h4 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Riwayat Peminjaman Karyawan</h4>
 
+
             <div v-if="riwayatPinjaman.length > 0">
+              <p>
+                <strong>Catatan:</strong> "Pastikan karyawan ini tidak sedang mengajukan pinjaman lain/memiliki pinjaman aktif." 
+              </p>
+              <p class="mb-4 text-sm text-gray-500">Total: {{ riwayatPinjaman.length }} Pengajuan Tercatat</p>
               <vue-good-table :columns="historyColumns" :rows="riwayatPinjaman" :pagination-options="{
                 enabled: true,
                 perPage: 3,
                 perPageDropdown: [3, 5, 10],
               }" :sort-options="{
-              enabled: true,
-              initialSortBy: { field: 'tanggal_pengajuan', type: 'desc' } // Default sort
-            }">
+                enabled: true,
+                initialSortBy: { field: 'tanggal_pengajuan', type: 'desc' } // Default sort
+              }">
 
                 <template #table-row="props">
                   <span v-if="props.column.field === 'jumlah_pinjaman'">
@@ -203,6 +208,10 @@ const getApprovalStatusByRole = (persetujuanList, role) => {
 const canApprove = computed(() => {
   const roles = ['ketua', 'sekretaris', 'bendahara'];
   return roles.includes(currentUserRole.value);
+});
+
+const isWaitingApproval = computed(() => {
+  return pinjamanDetail.value.status_pinjaman === 'menunggu_persetujuan';
 });
 
 const isKaryawan = computed(() => {
