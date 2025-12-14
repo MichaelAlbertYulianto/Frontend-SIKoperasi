@@ -167,6 +167,8 @@ const pinjamanStatusClass = (status) => {
             return 'inline-flex items-center rounded-full bg-error-100 px-2 py-0.5 text-xs font-medium text-error-800';
         case 'menunggu_persetujuan':
             return 'inline-flex items-center rounded-full bg-warning-100 px-2 py-0.5 text-xs font-medium text-warning-800';
+        case 'dicairkan':
+            return 'inline-flex items-center rounded-full bg-success-100 px-2 py-0.5 text-xs font-medium text-info-800';
         default:
             return 'inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800';
     }
