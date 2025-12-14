@@ -238,6 +238,7 @@ import MenuIcon from "@/icons/MenuIcon.vue";
 import ArchiveIcon from "@/icons/ArchiveIcon.vue";
 import HomePageIcon from "@/icons/HomePageIcon.vue";
 import AjukanPinjamanIcon from "@/icons/AjukanPinjamanIcon.vue";
+import PinjamanAktifIcon from "@/icons/PinjamanAktifIcon.vue";
 
 
 const route = useRoute();
@@ -277,6 +278,11 @@ const menuGroups = [
         name: "Pencairan Pinjaman",
         path: "/pencairan-pinjaman",
       },
+      {
+        icon: PinjamanAktifIcon,
+        name: "Pinjaman Aktif",
+        path: "/pinjaman-aktif",
+      }
     ]
   },
   {

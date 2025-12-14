@@ -263,6 +263,26 @@ const router = createRouter({
         roles: ['bendahara', 'admin'],
       },
     },
+    {
+      path: '/pinjaman-aktif',
+      name: 'Pinjaman Aktif',
+      component: () => import('../views/Pages/PinjamanAktif.vue'),
+      meta: {
+        title: 'Pinjaman Aktif',
+        requiresAuth: true,
+        roles: ['bendahara'],
+      },
+    },
+    {
+      path: '/detail-angsuran/:id',
+      name: 'Detail Angsuran',
+      component: () => import('../views/Pages/DetailAngsuranPinjaman.vue'),
+      meta: {
+        title: 'Detail Angsuran',
+        requiresAuth: true,
+        roles: ['bendahara', 'karyawan'],
+      },
+    },
 
     // {
     //   path: '/signin',
