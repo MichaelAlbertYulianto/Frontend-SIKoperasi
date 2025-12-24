@@ -132,6 +132,7 @@ const handleSubmit = async () => {
         const response = await axios.post(`${API_BASE_URL}/auth/login`, requestBody)
         const getNama = await axios.get(`${API_BASE_URL}/user/profile`, {
             headers: {
+                'ngrok-skip-browser-warning': '69420',
                 'Authorization': `Bearer ${response.data.user_token}`
             }
         })

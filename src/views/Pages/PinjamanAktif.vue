@@ -140,7 +140,10 @@ const fetchActivePinjaman = async () => {
   try {
 
     const response = await axios.get(`${API_BASE_URL}/pinjaman/aktif`, {
-      headers: { 'Authorization': `Bearer ${userToken}` }
+      headers: {
+        'ngrok-skip-browser-warning': '69420',
+        'Authorization': `Bearer ${userToken}`
+      }
     });
 
     const rawPinjamanData = response.data.data;
@@ -157,7 +160,10 @@ const fetchActivePinjaman = async () => {
       if (id_karyawan) {
         try {
           const karyawanRes = await axios.get(`${API_BASE_URL}/karyawan/${id_karyawan}`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
+            headers: {
+              'ngrok-skip-browser-warning': '69420',
+              'Authorization': `Bearer ${userToken}`
+            }
           });
           nama_karyawan = karyawanRes.data.data.nama_karyawan;
         } catch (e) {

@@ -162,7 +162,10 @@ const fetchHistoryPinjaman = async () => {
 
     try {
         const response = await axios.get(`${API_BASE_URL}${API_ENDPOINT}`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
+            headers: { 
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}` 
+            }
         });
 
         let rawPinjamanData = response.data.data;
@@ -172,7 +175,10 @@ const fetchHistoryPinjaman = async () => {
 
         const karyawanLookups = uniqueKaryawanIds.map(karyawanId =>
             axios.get(`${API_BASE_URL}/karyawan/${karyawanId}`, {
-                headers: { 'Authorization': `Bearer ${userToken}` }
+            headers: { 
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}` 
+            }
             })
             .then(res => {
                 karyawanMap[karyawanId] = res.data.data.nama_karyawan || 'N/A';

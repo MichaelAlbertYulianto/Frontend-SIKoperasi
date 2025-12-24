@@ -123,6 +123,7 @@ const fetchLogList = async () => {
     try {
         const response = await axios.get(`${API_BASE_URL}/log`, {
             headers: {
+                'ngrok-skip-browser-warning': '69420',
                 'Authorization': `Bearer ${userToken}`
             }
         });
@@ -131,7 +132,10 @@ const fetchLogList = async () => {
         const userMap = {};
         const userLookups = uniqueUserIds.map(userId =>
             axios.get(`${API_BASE_URL}/user/${userId}`, {
-                headers: { 'Authorization': `Bearer ${userToken}` }
+                headers: {
+                    'ngrok-skip-browser-warning': '69420',
+                    'Authorization': `Bearer ${userToken}`
+                }
             })
                 .then(res => {
                     const namaKaryawan = res.data.data.nama_karyawan;

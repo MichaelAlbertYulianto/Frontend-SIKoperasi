@@ -210,11 +210,16 @@ const fetchAngsuranDetails = async () => {
 
     try {
         promises.pinjaman = axios.get(`${API_BASE_URL}/pinjaman/pinjaman/${pinjamanId.value}`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
+            headers: { 
+            'ngrok-skip-browser-warning': '69420',
+            'Authorization': `Bearer ${userToken}` 
+        }
         });
 
         promises.angsuran = axios.get(`${API_BASE_URL}/angsuran/pinjaman/${pinjamanId.value}`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
+            headers: { 
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}` }
         });
         
         const [pinjamanRes, angsuranRes] = await Promise.all([
@@ -225,7 +230,9 @@ const fetchAngsuranDetails = async () => {
         const pDetail = pinjamanRes.data.data;
         
         const karyawanRes = await axios.get(`${API_BASE_URL}/karyawan/${pDetail.id_karyawan}`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
+            headers: { 
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}` }
         });
         const nama_karyawan = karyawanRes.data.data.nama_karyawan;
 

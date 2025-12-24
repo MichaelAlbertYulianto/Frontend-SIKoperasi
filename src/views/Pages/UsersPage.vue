@@ -161,15 +161,19 @@ const fetchUserList = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/user/`, {
       headers: {
+        'ngrok-skip-browser-warning': '69420',
         'Authorization': `Bearer ${userToken}`
-      }
+      },
     });
 
     let userData = response.data.data;
 
     const userDetailsPromises = userData.map(user =>
       axios.get(`${API_BASE_URL}/karyawan/${user.id_karyawan}`, {
-        headers: { 'Authorization': `Bearer ${userToken}` }
+        headers: {
+          'ngrok-skip-browser-warning': '69420',
+          'Authorization': `Bearer ${userToken}`
+        }
       })
         .then(res => {
           const namaKaryawan = res.data.data.nama_karyawan || 'N/A';

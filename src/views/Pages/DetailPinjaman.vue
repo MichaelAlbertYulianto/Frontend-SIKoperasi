@@ -57,6 +57,12 @@
             </div>
 
             <div class="flex justify-between py-1 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+              <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Angsuran/bulan</span>
+              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
+                formatCurrency(pinjamanDetail.perhitungan?.totalKewajiban / pinjamanDetail.tenor) }}</span>
+            </div>
+
+            <div class="flex justify-between py-1 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
               <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Estimasi Total Pengembalian</span>
               <span class="text-sm font-semibold text-gray-900 dark:text-white">{{
                 formatCurrency(pinjamanDetail.perhitungan?.totalKewajiban) }}</span>
@@ -197,7 +203,7 @@ const historyColumns = ref([
   { label: 'Tujuan', field: 'tujuan_pinjaman', sortable: true },
   { label: 'Pengajuan', field: 'tanggal_pengajuan', sortable: true, type: 'date', dateInputFormat: 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'', dateOutputFormat: 'dd MMM yyyy', },
   { label: 'Status Saat Ini', field: 'status_pinjaman', sortable: true },
-  { label: 'Persetujuan', field: 'persetujuan_detail', sortable: false }, // Kolom custom
+  { label: 'Persetujuan', field: 'persetujuan_detail', sortable: false }, 
 ]);
 
 const getApprovalStatusByRole = (persetujuanList, role) => {

@@ -92,7 +92,8 @@ const fetchUserProfile = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/user/profile`, {
       headers: {
-        Authorization: `Bearer ${userToken}`,
+        'ngrok-skip-browser-warning': '69420',
+        'Authorization': `Bearer ${userToken}`
       },
     })
 

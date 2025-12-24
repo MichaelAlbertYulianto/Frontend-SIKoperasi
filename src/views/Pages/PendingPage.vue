@@ -32,8 +32,7 @@
                         :sort-options="{
                             enabled: true,
                             initialSortBy: { field: 'tanggal_pengajuan', type: 'desc' },
-                        }"
-                        :pagination-options="{
+                        }" :pagination-options="{
                             enabled: true,
                             mode: 'records',
                             perPage: 10,
@@ -68,7 +67,7 @@
                                     Menunggu {{
                                         props.row.next_role && props.row.next_role !== 'N/A'
                                             ? (props.row.next_role.charAt(0).toUpperCase() + props.row.next_role.slice(1))
-                                    : 'Pengurus Lain'
+                                            : 'Pengurus Lain'
                                     }}
                                 </span>
                                 <span v-else :class="statusClass(props.row.status_pinjaman)">
@@ -137,23 +136,23 @@ const getMyApprovalStatus = (persetujuanList, userRole, userId) => {
     let isMyTurn = false;
 
 
-for (const role of APPROVAL_ORDER) {
+    for (const role of APPROVAL_ORDER) {
         const approvalEntry = persetujuanList.find(p => p.tahap_persetujuan.toLowerCase() === role);
-        
+
         if (approvalEntry) {
-            
+
             if (approvalEntry.status === 'menunggu') {
-                nextRoleToApprove = role; 
+                nextRoleToApprove = role;
 
                 if (role === userRole && approvalEntry.id_user === userId) {
                     isMyTurn = true;
                 }
-                break; 
+                break;
             }
-            
+
             if (approvalEntry.status === 'ditolak') {
-                nextRoleToApprove = 'DITOLAK_FINAL'; 
-                break; 
+                nextRoleToApprove = 'DITOLAK_FINAL';
+                break;
             }
         }
     }
@@ -225,15 +224,20 @@ const fetchPendingPinjaman = async () => {
     try {
         const response = await axios.get(`${API_BASE_URL}/pinjaman/pending`, {
             headers: {
-                'Authorization': `Bearer ${userToken}`
+                headers: {
+                    'ngrok-skip-browser-warning': '69420',
+                    'Authorization': `Bearer ${userToken}`
+                }
             }
         });
-
-        let pendingPinjaman = response.data.data;
+        let pendingPinjaman = response.data.data || [];
         const userLooksups = pendingPinjaman.map(async pinjaman => {
 
             const employeePromise = axios.get(`${API_BASE_URL}/karyawan/${pinjaman.id_karyawan}`, {
-                headers: { 'Authorization': `Bearer ${userToken}` }
+                headers: {
+                    'ngrok-skip-browser-warning': '69420',
+                    'Authorization': `Bearer ${userToken}`
+                }
             }).then(res => res.data.data.nama_karyawan).catch(() => 'N/A');
 
             const employeeName = await employeePromise;

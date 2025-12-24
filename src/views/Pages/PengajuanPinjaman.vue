@@ -132,7 +132,10 @@ const viewDetail = (pinjaman) => {
 const submitLoan = async (loanData) => {
     try {
         const userDetails = await axios.get(`${API_BASE_URL}/user/${currentUserId.value}`, {
-            headers: { 'Authorization': `Bearer ${userToken.value}` }
+            headers: { 
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}` 
+            }
         });
         const idKaryawan = userDetails.data.data.id_karyawan;
 
@@ -145,7 +148,10 @@ const submitLoan = async (loanData) => {
         };
 
         const response = await axios.post(`${API_BASE_URL}/pinjaman`, requestBody, {
-            headers: { 'Authorization': `Bearer ${userToken.value}` }
+            headers: { 
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}` 
+            }
         });
 
         Swal.fire('Berhasil!', 'Pengajuan pinjaman Anda telah berhasil dikirim.', 'success');
@@ -277,12 +283,18 @@ const fetchPinjamanList = async () => {
 
     try {
         const responseUser = await axios.get(`${API_BASE_URL}/user/${currentUserId.value}`, {
-            headers: { 'Authorization': `Bearer ${userToken.value}` }
+            headers: { 
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}` 
+            }
         });
         const idKaryawan = responseUser.data.data.id_karyawan;
 
         const response = await axios.get(`${API_BASE_URL}${API_ENDPOINT}/${idKaryawan}`, {
-            headers: { 'Authorization': `Bearer ${userToken.value}` }
+            headers: { 
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}` 
+            }
         });
 
         const rawPinjamanData = response.data.data;

@@ -199,15 +199,24 @@ const fetchSimpananData = async () => {
 
     try {
         const responseKaryawanId = await axios.get(`${API_BASE_URL}/user/${currentUserId}`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
+                headers: { 
+                    'ngrok-skip-browser-warning': '69420',
+                    'Authorization': `Bearer ${userToken}` 
+                }
         });
 
         const idKaryawan = responseKaryawanId.data.data.id_karyawan;
         const response = await axios.get(`${API_BASE_URL}/simpanan/karyawan/${idKaryawan}`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
+            headers: { 
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}` 
+            }
         });
         const responsePinjaman = await axios.get(`${API_BASE_URL}/pinjaman/user/${idKaryawan}`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
+            headers: { 
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}` 
+            }
         });
 
         let rawSimpananData = response.data.data;
