@@ -262,8 +262,5 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-.vgt-table {
-    @apply w-full;
-}
+<style>
 </style>
