@@ -224,10 +224,8 @@ const fetchPendingPinjaman = async () => {
     try {
         const response = await axios.get(`${API_BASE_URL}/pinjaman/pending`, {
             headers: {
-                headers: {
                     'ngrok-skip-browser-warning': '69420',
                     'Authorization': `Bearer ${userToken}`
-                }
             }
         });
         let pendingPinjaman = response.data.data || [];
