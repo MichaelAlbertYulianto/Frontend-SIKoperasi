@@ -134,7 +134,7 @@ const submitLoan = async (loanData) => {
         const userDetails = await axios.get(`${API_BASE_URL}/user/${currentUserId.value}`, {
             headers: { 
                 'ngrok-skip-browser-warning': '69420',
-                'Authorization': `Bearer ${userToken.value}` 
+                'Authorization': `Bearer ${userToken}` 
             }
         });
         const idKaryawan = userDetails.data.data.id_karyawan;
@@ -150,7 +150,7 @@ const submitLoan = async (loanData) => {
         const response = await axios.post(`${API_BASE_URL}/pinjaman`, requestBody, {
             headers: { 
                 'ngrok-skip-browser-warning': '69420',
-                'Authorization': `Bearer ${userToken.value}` 
+                'Authorization': `Bearer ${userToken}` 
             }
         });
 
@@ -275,7 +275,7 @@ const fetchPinjamanList = async () => {
     isLoading.value = true;
     error.value = null;
 
-    if (!currentUserId.value || !userToken.value) {
+    if (!currentUserId.value || !userToken) {
         error.value = "Sesi tidak valid.";
         isLoading.value = false;
         return;
