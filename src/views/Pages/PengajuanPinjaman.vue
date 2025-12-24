@@ -84,7 +84,7 @@ const isLoading = ref(true);
 const error = ref(null);
 
 const currentUserId = ref(localStorage.getItem('current_user_id'));
-const userToken = ref(localStorage.getItem('user_token'));
+const userToken = localStorage.getItem('user_token');
 
 const columns = ref([
     { label: 'Jumlah', field: 'jumlah_pinjaman', sortable: true, type: 'number' },
