@@ -85,13 +85,15 @@
             </div>
           </div>
 
-          <div v-if="!isKaryawan && isWaitingApproval" class="p-6 border rounded-lg dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div v-if="!isKaryawan && isWaitingApproval"
+            class="p-6 border rounded-lg dark:border-gray-700 bg-white dark:bg-gray-800">
             <h4 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">Riwayat Peminjaman Karyawan</h4>
 
 
             <div v-if="riwayatPinjaman.length > 0">
               <p>
-                <strong>Catatan:</strong> "Pastikan karyawan ini tidak sedang mengajukan pinjaman lain/memiliki pinjaman aktif." 
+                <strong>Catatan:</strong> "Pastikan karyawan ini tidak sedang mengajukan pinjaman lain/memiliki pinjaman
+                aktif."
               </p>
               <p class="mb-4 text-sm text-gray-500">Total: {{ riwayatPinjaman.length }} Pengajuan Tercatat</p>
               <vue-good-table :columns="historyColumns" :rows="riwayatPinjaman" :pagination-options="{
@@ -203,7 +205,7 @@ const historyColumns = ref([
   { label: 'Tujuan', field: 'tujuan_pinjaman', sortable: true },
   { label: 'Pengajuan', field: 'tanggal_pengajuan', sortable: true, type: 'date', dateInputFormat: 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'', dateOutputFormat: 'dd MMM yyyy', },
   { label: 'Status Saat Ini', field: 'status_pinjaman', sortable: true },
-  { label: 'Persetujuan', field: 'persetujuan_detail', sortable: false }, 
+  { label: 'Persetujuan', field: 'persetujuan_detail', sortable: false },
 ]);
 
 const getApprovalStatusByRole = (persetujuanList, role) => {
@@ -301,7 +303,10 @@ const handleApprovalAction = async (actionType) => {
 
   try {
     const response = await axios.put(`${API_BASE_URL}/pinjaman/persetujuan/${myApprovalId.value}/status`, updateBody, {
-      headers: { 'Authorization': `Bearer ${userToken}` }
+      headers: {
+        'ngrok-skip-browser-warning': '69420',
+        'Authorization': `Bearer ${userToken}`
+      }
     });
 
     Swal.fire({
@@ -398,7 +403,10 @@ const fetchPinjamanDetail = async () => {
 
   try {
     const pinjamanResponse = await axios.get(`${API_BASE_URL}/pinjaman/pinjaman/${pinjamanId.value}`, {
-      headers: { 'Authorization': `Bearer ${userToken}` }
+      headers: {
+        'ngrok-skip-browser-warning': '69420',
+        'Authorization': `Bearer ${userToken}`
+      }
     });
 
     pinjamanDetail.value = pinjamanResponse.data.data;
@@ -418,13 +426,19 @@ const fetchPinjamanDetail = async () => {
 
     const karyawanId = pinjamanDetail.value.id_karyawan;
     const employeeResponse = await axios.get(`${API_BASE_URL}/karyawan/${karyawanId}`, {
-      headers: { 'Authorization': `Bearer ${userToken}` }
+      headers: {
+        'ngrok-skip-browser-warning': '69420',
+        'Authorization': `Bearer ${userToken}`
+      }
     });
 
     employeeName.value = employeeResponse.data.data.nama_karyawan || 'Nama Tidak Ditemukan';
 
     const historyResponse = await axios.get(`${API_BASE_URL}/pinjaman/user/${karyawanId}`, {
-      headers: { 'Authorization': `Bearer ${userToken}` }
+      headers: {
+        'ngrok-skip-browser-warning': '69420',
+        'Authorization': `Bearer ${userToken}`
+      }
     });
 
     let rawHistory = historyResponse.data.data.filter(
@@ -434,7 +448,10 @@ const fetchPinjamanDetail = async () => {
     const historyWithDetailsPromises = rawHistory.map(async (pinjaman) => {
       try {
         const detailRes = await axios.get(`${API_BASE_URL}/pinjaman/pinjaman/${pinjaman.id_pinjaman}`, {
-          headers: { 'Authorization': `Bearer ${userToken}` }
+          headers: {
+            'ngrok-skip-browser-warning': '69420',
+            'Authorization': `Bearer ${userToken}`
+          }
         });
         const persetujuanList = detailRes.data.data.persetujuan || [];
 
