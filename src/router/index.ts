@@ -283,6 +283,16 @@ const router = createRouter({
         roles: ['bendahara', 'karyawan'],
       },
     },
+    {
+      path: '/simpanan',
+      name: 'Simpanan',
+      component: () => import('../views/Pages/SimpananPage.vue'),
+      meta: {
+        title: 'Simpanan',
+        requiresAuth: true,
+        roles: ['bendahara'],
+      },
+    },
 
     // {
     //   path: '/signin',
