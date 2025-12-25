@@ -21,7 +21,7 @@
             </div>
 
             <div v-else class="audit-log-table">
-                <vue-good-table :columns="columns" :rows="logList" :search-options="{
+                <vue-good-table :columns="columns" :rows="logList" :theme="isDarkMode ? 'nocturnal' : 'polar-bear'" :search-options="{
                     enabled: true,
                     placeholder: 'Cari berdasarkan aksi atau detail...',
                 }" :pagination-options="{
@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import axios from 'axios';
@@ -166,7 +166,27 @@ const fetchLogList = async () => {
     }
 };
 
+const isDarkMode = ref(false);
+
+const updateTheme = () => {
+  isDarkMode.value = document.documentElement.classList.contains("dark");
+};
+
+let themeObserver;
+
 onMounted(() => {
     fetchLogList();
+    updateTheme();
+    themeObserver = new MutationObserver(() => {
+        updateTheme();
+    });
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class"],
+    });
+});
+
+onUnmounted(() => {
+  if (themeObserver) themeObserver.disconnect();
 });
 </script>

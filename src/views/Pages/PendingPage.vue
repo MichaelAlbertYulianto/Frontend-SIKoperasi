@@ -28,6 +28,7 @@
                             currentUserRole.slice(1) }}.
                     </p>
                     <vue-good-table :columns="columns" :rows="pinjamanList"
+                        :theme="isDarkMode ? 'nocturnal' : 'polar-bear'"
                         :search-options="{ enabled: true, placeholder: 'Cari nama, jumlah, atau tujuan...' }"
                         :sort-options="{
                             enabled: true,
@@ -37,6 +38,8 @@
                             mode: 'records',
                             perPage: 10,
                             perPageDropdown: [10, 20, 50],
+                            rowsPerPageLabel: 'Baris per halaman',
+                            ofLabel: 'dari',
                         }">
                         <template #table-row="props">
                             <span v-if="props.column.field === 'nama_karyawan'">
@@ -98,7 +101,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, onUnmounted } from "vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import axios from 'axios';
@@ -224,8 +227,8 @@ const fetchPendingPinjaman = async () => {
     try {
         const response = await axios.get(`${API_BASE_URL}/pinjaman/pending`, {
             headers: {
-                    'ngrok-skip-browser-warning': '69420',
-                    'Authorization': `Bearer ${userToken}`
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}`
             }
         });
         let pendingPinjaman = response.data.data || [];
@@ -279,8 +282,26 @@ const showApprovalColumn = computed(() => {
 });
 
 
+const isDarkMode = ref(false);
+
+const updateTheme = () => {
+    isDarkMode.value = document.documentElement.classList.contains("dark");
+};
+
+let themeObserver;
+
 
 onMounted(() => {
     fetchPendingPinjaman();
+    updateTheme();
+    themeObserver = new MutationObserver(updateTheme);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class"],
+    });
+});
+
+onUnmounted(() => {
+    if (themeObserver) themeObserver.disconnect();
 });
 </script>

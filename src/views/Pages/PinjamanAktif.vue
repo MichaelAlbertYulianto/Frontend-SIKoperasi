@@ -28,12 +28,14 @@
         </div>
 
         <div v-else class="overflow-x-auto">
-          <vue-good-table :columns="columns" :rows="pinjamanList"
+          <vue-good-table :columns="columns" :rows="pinjamanList" :theme="isDarkMode ? 'nocturnal' : 'polar-bear'"
             :search-options="{ enabled: true, placeholder: 'Cari nama atau tujuan...' }" :pagination-options="{
               enabled: true,
               mode: 'records',
               perPage: 10,
               perPageDropdown: [10, 20, 50],
+              rowsPerPageLabel: 'Baris per halaman',
+              ofLabel: 'dari',
             }" :sort-options="{
               enabled: true,
               initialSortBy: { field: 'updated_at', type: 'desc' }
@@ -74,7 +76,7 @@
 <script setup>
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 import { VueGoodTable } from 'vue-good-table-next';
 import { useRouter } from 'vue-router';
@@ -188,8 +190,32 @@ const fetchActivePinjaman = async () => {
   }
 };
 const currentPageTitle = ref("Pinjaman Aktif");
+
+
+const isDarkMode = ref(false);
+
+const updateTheme = () => {
+  isDarkMode.value = document.documentElement.classList.contains("dark");
+};
+
+let themeObserver;
+
 onMounted(() => {
   fetchActivePinjaman();
+  updateTheme();
+
+  themeObserver = new MutationObserver(() => {
+    updateTheme();
+  });
+
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+});
+
+onUnmounted(() => {
+  if (themeObserver) themeObserver.disconnect();
 });
 </script>
 

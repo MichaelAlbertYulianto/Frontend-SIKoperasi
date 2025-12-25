@@ -21,13 +21,15 @@
       </div>
 
       <div v-else class="user-management-table">
-        <vue-good-table :columns="columns" :rows="userList" :search-options="{
+        <vue-good-table :columns="columns" :rows="userList"
+          :theme="isDarkMode ? 'nocturnal' : 'polar-bear'"
+          :search-options="{
           enabled: true,
           placeholder: 'Cari pengguna...',
         }" :pagination-options="{
           enabled: true,
           mode: 'records',
-          perPage: 10,
+          perPage: 5,
           perPageDropdown: [5, 10, 20, 50],
           dropdownAllowAll: false,
           setCurrentPage: 1,
@@ -44,9 +46,7 @@
               </span>
             </span>
             <span v-else-if="props.column.field === 'id_user'">
-              <span :class="roleClass(props.row.id_user)">
                 {{ props.row.id_user || 'N/A' }}
-              </span>
             </span>
             <span v-else-if="props.column.field === 'status'">
               <span :class="statusClass(props.row.status)">
@@ -76,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import axios from 'axios';
@@ -200,8 +200,27 @@ const fetchUserList = async () => {
   }
 };
 
+const isDarkMode = ref(false);
+
+const updateTheme = () => {
+  isDarkMode.value = document.documentElement.classList.contains("dark");
+};
+
+let themeObserver;
+
 onMounted(() => {
   fetchUserList();
+  updateTheme();
+  themeObserver = new MutationObserver(() => {
+    updateTheme();
+  });
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+});
+onUnmounted(() => {
+  if (themeObserver) themeObserver.disconnect();
 });
 </script>
 
