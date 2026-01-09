@@ -108,6 +108,7 @@ const fetchUserProfile = async () => {
       signOut()
     } else {
       console.error('Error fetching user profile:', error)
+      router.push('/error-404')
     }
   }
 }
