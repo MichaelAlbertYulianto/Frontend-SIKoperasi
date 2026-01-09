@@ -172,7 +172,26 @@ const router = createRouter({
         requiresAuth: false,
       },
     },
-
+    {
+      path: '/karyawan',
+      name: 'Karyawan',
+      component: () => import('../views/Pages/KaryawanPage.vue'),
+      meta: {
+        title: 'Karyawan',
+        requiresAuth: true,
+        roles: ['admin'],
+      },
+    },
+    {
+      path: '/penarikan-simpanan',
+      name: 'Penarikan Simpanan',
+      component: () => import('../views/Pages/PenarikanSimpanan.vue'),
+      meta: {
+        title: 'Penarikan Simpanan',
+        requiresAuth: true,
+        roles: ['bendahara'],
+      },
+    },
     {
       path: '/pendingan-pinjaman',
       name: 'Pendingan Pinjaman',
@@ -289,6 +308,16 @@ const router = createRouter({
       component: () => import('../views/Pages/SimpananPage.vue'),
       meta: {
         title: 'Simpanan',
+        requiresAuth: true,
+        roles: ['bendahara'],
+      },
+    },
+    {
+      path: '/transaksi',
+      name: 'Transaksi',
+      component: () => import('../views/Pages/TransaksiPage.vue'),
+      meta: {
+        title: 'Transaksi',
         requiresAuth: true,
         roles: ['bendahara'],
       },

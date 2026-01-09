@@ -239,6 +239,7 @@ import ArchiveIcon from "@/icons/ArchiveIcon.vue";
 import HomePageIcon from "@/icons/HomePageIcon.vue";
 import AjukanPinjamanIcon from "@/icons/AjukanPinjamanIcon.vue";
 import PinjamanAktifIcon from "@/icons/PinjamanAktifIcon.vue";
+import TransaksiIcon from "@/icons/TransaksiIcon.vue";
 
 
 const route = useRoute();
@@ -292,7 +293,22 @@ const menuGroups = [
         icon: BoxCubeIcon,
         name: "Simpanan",
         path: "/simpanan",
+      },
+      {
+        icon: PlugInIcon,
+        name: "Penarikan Simpanan",
+        path: "/penarikan-simpanan",
       }
+    ]
+  },
+  {
+    title: "Transaksi",
+    items: [
+      {
+        icon: TransaksiIcon,
+        name: "Transaksi",
+        path: "/transaksi",
+      },
     ]
   },
   {
@@ -308,6 +324,11 @@ const menuGroups = [
         name: "Log",
         path: "/log",
       },
+      {
+        icon: PageIcon,
+        name: "Karyawan Management",
+        path: "/karyawan",
+      }
     ]
   },
   {
@@ -342,7 +363,7 @@ const filteredMenuGroups = computed(() => {
             } else if (group.title === "Karyawan Menu") {
                 const allowed = ['karyawan'];
                 isGroupVisible = isAllowed(userRole.value, allowed);
-            } else if (group.title === "Pencairan & Pelunasan" || group.title === "Iuran Anggota") {
+            } else if (group.title === "Pencairan & Pelunasan" || group.title === "Iuran Anggota" || group.title === "Transaksi") {
                 const allowed = ['bendahara'];
                 isGroupVisible = isAllowed(userRole.value, allowed);
             }
