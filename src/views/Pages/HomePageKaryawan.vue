@@ -30,69 +30,69 @@
 
                 <div v-else class="simpanan-history-table">
                     <!-- <div v-if="simpananList.length === 0" class="text-sm text-gray-500 py-4"> -->
-                        <!-- Belum ada riwayat simpanan. -->
+                    <!-- Belum ada riwayat simpanan. -->
                     <!-- </div> -->
                     <!-- <div v-else> -->
-                        <vue-good-table :columns="columns" :rows="simpananList"
-                            :search-options="{ enabled: true, placeholder: 'Cari jenis simpanan...' }"
-                            :pagination-options="{
-                                enabled: true,
-                                mode: 'records',
-                                perPage: 10,
-                                perPageDropdown: [10, 20],
-                            }">
-                            <template #table-row="props">
-                                <span v-if="props.column.field === 'jumlah'">
-                                    {{ formatCurrency(props.row.jumlah) }}
-                                </span>
-                                <span v-else-if="props.column.field === 'tanggal_simpan'">
-                                    {{ formatDate(props.row.tanggal_simpan) }}
-                                </span>
-                                <span v-else-if="props.column.field === 'jenis_simpanan'">
-                                    <span :class="simpananTypeClass(props.row.jenis_simpanan)">
-                                        {{ formatStatus(props.row.jenis_simpanan) }}
-                                    </span>
-                                </span>
-                                <span v-else>
-                                    {{ props.formattedRow[props.column.field] }}
-                                </span>
-                            </template>
-                        </vue-good-table>
-                    <!-- </div> -->
-                </div>
-
-                <h4 class="mt-8 font-semibold text-gray-800 text-lg dark:text-white/90">Riwayat Pinjaman Saya</h4>
-                <!-- <div v-if="riwayatPinjaman.length > 0" class="pinjaman-history-table"> -->
-                    <vue-good-table :columns="columnsPinjaman" :rows="riwayatPinjaman"
-                        :search-options="{ enabled: true, placeholder: 'Cari tujuan pinjaman...' }" :pagination-options="{
+                    <vue-good-table :theme="isDarkMode ? 'nocturnal' : 'polar-bear'":columns="columns" :rows="simpananList"
+                    
+                        :search-options="{ enabled: true, placeholder: 'Cari jenis simpanan...' }" :pagination-options="{
                             enabled: true,
                             mode: 'records',
-                            perPage: 5,
-                            perPageDropdown: [5, 10, 20],
+                            perPage: 10,
+                            perPageDropdown: [10, 20],
                         }">
                         <template #table-row="props">
-                            <span v-if="props.column.field === 'jumlah_pinjaman'">
-                                {{ formatCurrency(props.row.jumlah_pinjaman) }}
+                            <span v-if="props.column.field === 'jumlah'">
+                                {{ formatCurrency(props.row.jumlah) }}
                             </span>
-                            <span v-else-if="props.column.field === 'tanggal_pengajuan'">
-                                {{ formatDate(props.row.tanggal_pengajuan) }}
+                            <span v-else-if="props.column.field === 'tanggal_simpan'">
+                                {{ formatDate(props.row.tanggal_simpan) }}
                             </span>
-                            <span v-else-if="props.column.field === 'status_pinjaman'">
-                                <span :class="pinjamanStatusClass(props.row.status_pinjaman)">
-                                    {{ formatStatus(props.row.status_pinjaman) }}
+                            <span v-else-if="props.column.field === 'jenis_simpanan'">
+                                <span :class="simpananTypeClass(props.row.jenis_simpanan)">
+                                    {{ formatStatus(props.row.jenis_simpanan) }}
                                 </span>
-                            </span>
-                            <span v-else-if="props.column.field === 'aksi'">
-                                <button @click="viewDetail(props.row)"
-                                    class="text-brand-500 hover:text-brand-600 dark:text-brand-400 font-medium">
-                                    Detail
-                                </button>
                             </span>
                             <span v-else>
                                 {{ props.formattedRow[props.column.field] }}
                             </span>
                         </template>
                     </vue-good-table>
+                    <!-- </div> -->
+                </div>
+
+                <h4 class="mt-8 font-semibold text-gray-800 text-lg dark:text-white/90">Riwayat Pinjaman Saya</h4>
+                <!-- <div v-if="riwayatPinjaman.length > 0" class="pinjaman-history-table"> -->
+                <vue-good-table :theme="isDarkMode ? 'nocturnal' : 'polar-bear'" :columns="columnsPinjaman" :rows="riwayatPinjaman"
+                    :search-options="{ enabled: true, placeholder: 'Cari tujuan pinjaman...' }" :pagination-options="{
+                        enabled: true,
+                        mode: 'records',
+                        perPage: 5,
+                        perPageDropdown: [5, 10, 20],
+                    }">
+                    <template #table-row="props">
+                        <span v-if="props.column.field === 'jumlah_pinjaman'">
+                            {{ formatCurrency(props.row.jumlah_pinjaman) }}
+                        </span>
+                        <span v-else-if="props.column.field === 'tanggal_pengajuan'">
+                            {{ formatDate(props.row.tanggal_pengajuan) }}
+                        </span>
+                        <span v-else-if="props.column.field === 'status_pinjaman'">
+                            <span :class="pinjamanStatusClass(props.row.status_pinjaman)">
+                                {{ formatStatus(props.row.status_pinjaman) }}
+                            </span>
+                        </span>
+                        <span v-else-if="props.column.field === 'aksi'">
+                            <button @click="viewDetail(props.row)"
+                                class="text-brand-500 hover:text-brand-600 dark:text-brand-400 font-medium">
+                                Detail
+                            </button>
+                        </span>
+                        <span v-else>
+                            {{ props.formattedRow[props.column.field] }}
+                        </span>
+                    </template>
+                </vue-good-table>
                 <!-- </div> -->
                 <!-- <div v-else class="text-sm text-gray-500 py-4">
                     Belum ada riwayat pengajuan pinjaman.
@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, onUnmounted } from "vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import axios from 'axios';
@@ -199,23 +199,23 @@ const fetchSimpananData = async () => {
 
     try {
         const responseKaryawanId = await axios.get(`${API_BASE_URL}/user/${currentUserId}`, {
-                headers: { 
-                    'ngrok-skip-browser-warning': '69420',
-                    'Authorization': `Bearer ${userToken}` 
-                }
+            headers: {
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}`
+            }
         });
 
         const idKaryawan = responseKaryawanId.data.data.id_karyawan;
         const response = await axios.get(`${API_BASE_URL}/simpanan/karyawan/${idKaryawan}`, {
-            headers: { 
+            headers: {
                 'ngrok-skip-browser-warning': '69420',
-                'Authorization': `Bearer ${userToken}` 
+                'Authorization': `Bearer ${userToken}`
             }
         });
         const responsePinjaman = await axios.get(`${API_BASE_URL}/pinjaman/user/${idKaryawan}`, {
-            headers: { 
+            headers: {
                 'ngrok-skip-browser-warning': '69420',
-                'Authorization': `Bearer ${userToken}` 
+                'Authorization': `Bearer ${userToken}`
             }
         });
 
@@ -259,7 +259,24 @@ const fetchSimpananData = async () => {
     }
 };
 
+const isDarkMode = ref(false);
+
+const updateTheme = () => {
+  isDarkMode.value = document.documentElement.classList.contains("dark");
+};
+
+let themeObserver;
+
 onMounted(() => {
     fetchSimpananData();
+    updateTheme();
+    themeObserver = new MutationObserver(updateTheme);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+});
+
+onUnmounted(() => {
+    if (themeObserver) {
+        themeObserver.disconnect();
+    }
 });
 </script>

@@ -25,7 +25,7 @@
 
                 <div v-else class="pinjaman-history-table">
                     <div v-if="pinjamanList.length > 0">
-                        <vue-good-table :columns="columns" :rows="pinjamanList"
+                        <vue-good-table :theme="isDarkMode ? 'nocturnal' : 'polar-bear'" :columns="columns" :rows="pinjamanList"
                             :search-options="{ enabled: true, placeholder: 'Cari tujuan pinjaman...' }"
                             :pagination-options="{
                                 enabled: true,
@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
 import axios from 'axios';
@@ -166,9 +166,12 @@ const submitLoan = async (loanData) => {
 
 
 const openLoanModal = async () => {
+    const isDark = document.documentElement.classList.contains("dark");
     const { value: formValues } = await Swal.fire({
         title: 'Ajukan Pinjaman Baru',
         width: 500, 
+        background: isDark ? '#1e1e2f' : '#ffffff',
+        color: isDark ? '#ffffff' : '#000000',
 
         html: `
             <style>
@@ -328,7 +331,24 @@ const fetchPinjamanList = async () => {
     }
 };
 
+const isDarkMode = ref(false);
+
+const updateTheme = () => {
+  isDarkMode.value = document.documentElement.classList.contains("dark");
+};
+
+let themeObserver;
+
 onMounted(() => {
     fetchPinjamanList();
+    updateTheme();
+    themeObserver = new MutationObserver(updateTheme);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+});
+
+onUnmounted(() => {
+    if (themeObserver) {
+        themeObserver.disconnect();
+    }
 });
 </script>
