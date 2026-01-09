@@ -854,3 +854,18 @@ body.dark .vgt-wrap button,
     color: #f3f4f6;
     border-color: #4b5563;
 } */
+
+.dark .swal2-popup {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+}
+
+.dark .swal2-title, .dark .swal2-content {
+  color: #f3f4f6 !important;
+}
+
+.dark .swal2-input, .dark .swal2-textarea {
+  background-color: #374151 !important;
+  color: white !important;
+  border: 1px solid #4b5563 !important;
+}
