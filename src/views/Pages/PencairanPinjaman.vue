@@ -178,7 +178,7 @@ const openDisburseModal = async (pinjaman) => {
                 <p class="text-sm"><strong>Nama Bank:</strong> ${pinjaman.nama_bank}</p>
                 <p class="text-sm">
                     <strong>Nomor Rekening:</strong>
-                    <span class="font-mono bg-yellow-100 p-1 rounded">${pinjaman.rekening_bank}</span>                    
+                    <span class="font-mono">${pinjaman.rekening_bank}</span>                    
                 <span class="ml-2 text-xs text-gray-500">
                     Nomor rekening telah disalin ke clipboard.
                 </span>
