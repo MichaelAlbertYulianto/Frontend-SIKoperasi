@@ -2,7 +2,7 @@
   <admin-layout>
     <PageBreadcrumb :pageTitle="currentPageTitle" />
     <div class="p-6 bg-white dark:bg-gray-800 shadow rounded-lg">
-      <h1 class="text-3xl font-semibold text-gray-900 dark:text-white mb-6">Daftar Pinjaman Aktif (Dicairkan)</h1>
+      <h1 class="text-3xl font-semibold text-gray-900 dark:text-white mb-6">Daftar Pinjaman yang Sedang Berjalan</h1>
 
       <div v-if="isLoading" class="text-center py-10">
         <svg class="animate-spin h-8 w-8 text-indigo-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none"

@@ -281,7 +281,7 @@ const menuGroups = [
       },
       {
         icon: PinjamanAktifIcon,
-        name: "Pinjaman Aktif",
+        name: "Pembayaran Angsuran",
         path: "/pinjaman-aktif",
       }
     ]
