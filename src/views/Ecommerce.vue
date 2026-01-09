@@ -10,16 +10,16 @@
       </div>
 
       <div class="col-span-12">
-        <statistics-chart />
+        <chart-pengeluaran-pemasukan />
       </div>
 
-      <div class="col-span-12 xl:col-span-5">
+      <!-- <div class="col-span-12 xl:col-span-5">
         <customer-demographic />
       </div>
 
       <div class="col-span-12 xl:col-span-7">
         <recent-orders />
-      </div>
+      </div> -->
       
     </div>
   </admin-layout>
@@ -37,9 +37,12 @@ import SaldoTersedia from '@/components/dashboardSIKSP/SaldoTersedia.vue'
 import PinjamanAktif from '@/components/dashboardSIKSP/PinjamanAktif.vue'
 import SaldoDipinjamn from '@/components/dashboardSIKSP/SaldoDipinjamn.vue'
 import TotalAsset from '@/components/dashboardSIKSP/TotalAsset.vue'
+import ChartPengeluaranPemasukan from '@/components/dashboardSIKSP/ChartPengeluaranPemasukan.vue'
+
 export default {
   components: {
     SaldoTersedia,
+    ChartPengeluaranPemasukan,
     PinjamanAktif,
     SaldoDipinjamn,
     TotalAsset,
