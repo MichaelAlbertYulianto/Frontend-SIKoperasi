@@ -167,99 +167,87 @@ const submitLoan = async (loanData) => {
 
 const openLoanModal = async () => {
     const isDark = document.documentElement.classList.contains("dark");
+    
+    Swal.fire({
+        title: 'Menyiapkan Formulir...',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+    });
+
+    const maxLoanLimit = await fetchMaxLoan();
+    Swal.close();
+
     const { value: formValues } = await Swal.fire({
         title: 'Ajukan Pinjaman Baru',
         width: 500, 
         background: isDark ? '#1e1e2f' : '#ffffff',
         color: isDark ? '#ffffff' : '#000000',
-
         html: `
             <style>
-                .swal2-container .swal2-input, 
-                .swal2-container .swal2-textarea,
-                .swal2-container .swal2-select {
-                    width: 100% !important; 
-                    margin: 5px 0 10px 0 !important;
-                    box-sizing: border-box;
-                    border: 1px solid #d1d9e6 !important;
-                    border-radius: 8px !important;
+                .swal2-container .swal2-input, .swal2-container .swal2-textarea, .swal2-container .swal2-select {
+                    width: 100% !important; margin: 5px 0 10px 0 !important; border: 1px solid #d1d9e6 !important; border-radius: 8px !important;
                 }
-                .input-group {
-                    display: flex; 
-                    align-items: center; 
-                    margin-bottom: 10px;
-                }
-                .input-group label {
-                    width: 120px; 
-                    text-align: left;
-                    font-weight: 500;
-                    font-size: 14px;
-                }
-                .input-group input, .input-group select, .input-group textarea {
-                    flex-grow: 1;
-                    margin-left: 10px;
-                }
+                .input-group { display: flex; align-items: center; margin-bottom: 10px; }
+                .input-group label { width: 130px; text-align: left; font-weight: 500; font-size: 14px; }
+                .input-group input, .input-group select { flex-grow: 1; margin-left: 10px; }
+                .limit-info { background: ${isDark ? '#2d2d44' : '#f0f4f8'}; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; border-left: 4px solid #465fff; }
             </style>
             
             <div style="text-align: left; margin-top: 15px;">
-                
-                <div class="input-group">
-                    <label for="swal-jumlah">Jumlah Pinjaman (Rp):</label>
-                    <input id="swal-jumlah" class="swal2-input" type="text"> 
+                <div class="limit-info">
+                    <strong>Batas Maksimal Pinjaman:</strong><br>
+                    <span style="color: #465fff; font-size: 16px; font-weight: bold;">${formatCurrency(maxLoanLimit)}</span>
                 </div>
 
                 <div class="input-group">
-                    <label for="swal-tenor">Tenor Pinjaman:</label>
+                    <label for="swal-jumlah">Jumlah (Rp):</label>
+                    <input id="swal-jumlah" class="swal2-input" type="text" placeholder="Masukkan jumlah"> 
+                </div>
+
+                <div class="input-group">
+                    <label for="swal-tenor">Tenor:</label>
                     <select id="swal-tenor" class="swal2-select swal2-input">
-                        <option value="" disabled selected>Pilih Tenor Pinjaman</option>
+                        <option value="" disabled selected>Pilih Tenor</option>
                         <option value="3">3 Bulan</option>
                         <option value="6">6 Bulan</option>
-                        <option value="12">1 Tahun (12 Bulan)</option>
+                        <option value="12">12 Bulan</option>
                     </select>
                 </div>
                 
                 <div style="margin-top: 15px;">
                     <label for="swal-tujuan" style="display: block; font-weight: 500; margin-bottom: 5px;">Tujuan Pinjaman:</label>
-                    <textarea id="swal-tujuan" class="swal2-textarea" style="height: 100px;"></textarea>
+                    <textarea id="swal-tujuan" class="swal2-textarea" style="height: 80px;"></textarea>
                 </div>
-
             </div>
         `,
         focusConfirm: false,
         showCancelButton: true,
         confirmButtonText: 'Ajukan Sekarang',
-
         didOpen: () => {
             const jumlahInput = document.getElementById('swal-jumlah');
             jumlahInput.addEventListener('input', (event) => {
                 event.target.value = formatNumberInput(event.target.value);
             });
         },
-
         preConfirm: () => {
             const jumlahInput = document.getElementById('swal-jumlah');
-
-            const jumlah = jumlahInput.value;
-            const jumlahraw = jumlahInput.value;
             const tenor = document.getElementById('swal-tenor').value;
             const tujuan = document.getElementById('swal-tujuan').value;
-            const cleanJumlah = jumlah.replace(/\./g, '').replace(/,/g, '');
-
-            const cleanJumlahString = cleanJumlah.replace(/[^\d.-]/g, '');
-            const cleanJumlahFloat = parseFloat(cleanJumlahString);
+            
+            const cleanJumlah = jumlahInput.value.replace(/\./g, '').replace(/,/g, '');
+            const cleanJumlahFloat = parseFloat(cleanJumlah);
 
             if (!cleanJumlah || !tenor || !tujuan) {
                 Swal.showValidationMessage('Semua bidang wajib diisi');
                 return false;
             }
-            if (isNaN(parseFloat(cleanJumlah))) {
-                Swal.showValidationMessage('Jumlah pinjaman harus berupa angka valid.');
+            if (cleanJumlahFloat > maxLoanLimit) {
+                Swal.showValidationMessage(`Jumlah melebihi batas maksimal (${formatCurrency(maxLoanLimit)})`);
                 return false;
             }
-            const MIN_AMOUNT = 300000;
-            if (cleanJumlahFloat < MIN_AMOUNT) {
-                 Swal.showValidationMessage(`Jumlah pinjaman minimal adalah Rp ${formatNumberInput(MIN_AMOUNT.toString())}.`);
-                 return false;
+            if (cleanJumlahFloat < 300000) {
+                Swal.showValidationMessage('Jumlah pinjaman minimal adalah Rp 300.000');
+                return false;
             }
             return {
                 jumlah_pinjaman: cleanJumlah,
@@ -328,6 +316,21 @@ const fetchPinjamanList = async () => {
         }
     } finally {
         isLoading.value = false;
+    }
+};
+
+const fetchMaxLoan = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/pinjaman/max-loan/`, {
+            headers: { 
+                'ngrok-skip-browser-warning': '69420',
+                'Authorization': `Bearer ${userToken}` 
+            }
+        });
+        return parseFloat(response.data.data.max_loan_amount);
+    } catch (err) {
+        console.error('Error fetching max loan:', err);
+        return 0;
     }
 };
 
