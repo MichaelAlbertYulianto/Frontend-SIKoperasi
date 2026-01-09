@@ -57,8 +57,7 @@
             perPageDropdown: [10, 20, 50],
             rowsPerPageLabel: 'Baris per halaman',
             ofLabel: 'dari',
-          }"
-          :initial-sort="{
+          }" :initial-sort="{
             field: 'tanggal_simpan',
             type: 'desc',
           }">
@@ -69,25 +68,29 @@
 
             <span v-else-if="props.column.field === 'jenis_simpanan'">
               <span :class="jenisSimpananClass(props.row.jenis_simpanan)">
-                {{ props.row.jenis_simpanan.toUpperCase() }}
+                {{ props.row.jenis_simpanan ? props.row.jenis_simpanan.toUpperCase() : '-' }}
               </span>
             </span>
 
-            <span v-else-if="props.column.field === 'jumlah'" class="font-semibold text-gray-700 dark:text-gray-300">
-              {{ formatCurrency(props.row.jumlah) }}
-            </span>
+            <span v-else-if="props.column.field === 'jumlah'" :class="[
+              'font-semibold',
+              parseFloat(props.row.jumlah) < 0 || props.row.jenis_simpanan === 'penarikan'
+                ? 'text-red-600 dark:text-red-400'
+                : 'text-green-600 dark:text-green-400'
+            ]">
+              {{ parseFloat(props.row.jumlah) < 0 ? '' : '+' }} {{ formatCurrency(props.row.jumlah) }} </span>
 
-            <span v-else-if="props.column.field === 'tanggal_simpan'">
-              {{ formatDate(props.row.tanggal_simpan) }}
-            </span>
+                <span v-else-if="props.column.field === 'tanggal_simpan'">
+                  {{ formatDate(props.row.tanggal_simpan) }}
+                </span>
 
-            <span v-else-if="props.column.field === 'bulan_ke'">
-              {{ props.row.bulan_ke ? `Bulan ke-${props.row.bulan_ke}` : '-' }}
-            </span>
+                <span v-else-if="props.column.field === 'bulan_ke'">
+                  {{ props.row.bulan_ke ? `Bulan ke-${props.row.bulan_ke}` : '-' }}
+                </span>
 
-            <span v-else>
-              {{ props.formattedRow[props.column.field] }}
-            </span>
+                <span v-else>
+                  {{ props.formattedRow[props.column.field] }}
+                </span>
           </template>
         </vue-good-table>
       </div>
@@ -138,7 +141,7 @@ const formatDate = (dateString) => {
 const jenisSimpananClass = (jenis) => {
   const base = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ";
   if (jenis === "wajib") return base + "bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-400";
-  if (jenis === "pokok") return base + "bg-purple-100 text-purple-800 dark:bg-purple-500/20 dark:text-purple-400";
+  if (jenis === "penarikan") return base + "bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-400";
   return base + "bg-green-100 text-green-800 dark:bg-green-500/20 dark:text-green-400"; // sukarela
 };
 
@@ -148,7 +151,7 @@ const fetchSimpanan = async () => {
   const token = localStorage.getItem("user_token");
 
   try {
-    const response = await axios.get(`${API_BASE_URL}/simpanan/rekap`, {
+    const response = await axios.get(`${API_BASE_URL}/simpanan/`, {
       headers: {
         "ngrok-skip-browser-warning": "69420",
         Authorization: `Bearer ${token}`,
@@ -181,14 +184,15 @@ const downloadTemplate = async () => {
     });
 
     const daftarKaryawan = response.data.data || [];
+    const karyawanTanpaPengurus = daftarKaryawan.filter(k => k.jabatan !== 'Sekretaris' && k.jabatan !== 'Bendahara' && k.jabatan !== 'Ketua' && k.jabatan !== 'Admin');
 
-    if (daftarKaryawan.length === 0) {
+    if (karyawanTanpaPengurus.length === 0) {
       Swal.fire("Peringatan", "Tidak ada data karyawan ditemukan.", "warning");
       return;
     }
 
     const templateData = [];
-    daftarKaryawan.forEach((karyawan) => {
+    karyawanTanpaPengurus.forEach((karyawan) => {
       const gaji = parseFloat(karyawan.gaji) || 0;
       const simpananWajibDefault = gaji * 0.05;
 
@@ -245,6 +249,10 @@ const handleImport = (event) => {
       Swal.fire("Error", "File Excel kosong!", "error");
       return;
     }
+    if (!jsonData[0].hasOwnProperty('id_karyawan') || !jsonData[0].hasOwnProperty('jenis_simpanan') || !jsonData[0].hasOwnProperty('jumlah_simpanan')) {
+      Swal.fire("Error", "Format file tidak sesuai. Pastikan kolom 'id_karyawan', 'jenis_simpanan', dan 'jumlah_simpanan' ada.", "error");
+      return;
+    }
 
     confirmImport(jsonData);
   };
@@ -260,7 +268,7 @@ const confirmImport = async (data) => {
       id_karyawan: item.id_karyawan,
       jenis_simpanan: item.jenis_simpanan,
       jumlah_simpanan: parseFloat(item.jumlah_simpanan),
-      tanggal_simpanan: null 
+      tanggal_simpanan: null
     }));
 
   if (mappedData.length === 0) {
@@ -298,13 +306,13 @@ const confirmImport = async (data) => {
         timer: 2000,
         showConfirmButton: false
       });
-      
-      fetchSimpanan(); 
+
+      fetchSimpanan();
     } catch (err) {
       console.error("Import Error:", err);
       Swal.fire(
-        "Gagal", 
-        err.response?.data?.message || "Terjadi kesalahan saat memproses data di server.", 
+        "Gagal",
+        err.response?.data?.message || "Terjadi kesalahan saat memproses data di server.",
         "error"
       );
     } finally {
