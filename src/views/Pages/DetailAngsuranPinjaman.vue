@@ -112,7 +112,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, h } from "vue";
+import { ref, onMounted, h, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
@@ -133,7 +133,6 @@ const isLoading = ref(true);
 const error = ref(null);
 const userToken = localStorage.getItem('user_token');
 
-// Component DetailItem manual
 const DetailItem = {
   props: ['label', 'value'],
   setup(props, { slots }) {
@@ -158,7 +157,6 @@ const angsuranColumns = ref([
   { label: 'Aksi', field: 'actions', sortable: false },
 ]);
 
-// Helper: Cek baris mana yang boleh memunculkan tombol (Antrean Pertama)
 const isBarisAktif = (row) => {
   const barisTarget = angsuranList.value.find(item => 
     item.status_angsuran !== 'lunas' && item.status_angsuran !== 'ditunda'
@@ -267,5 +265,29 @@ const prosesAngsuran = async (row, tipe) => {
   }
 };
 
-onMounted(fetchAngsuranDetails);
+const isDarkMode = ref(false);
+
+const updateTheme = () => {
+  isDarkMode.value = document.documentElement.classList.contains("dark");
+};
+
+let themeObserver;
+
+onMounted(() => {
+  fetchAngsuranDetails();
+  updateTheme();
+
+  themeObserver = new MutationObserver(() => {
+    updateTheme();
+  });
+
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+});
+
+onUnmounted(() => {
+  if (themeObserver) themeObserver.disconnect();
+});
 </script>
