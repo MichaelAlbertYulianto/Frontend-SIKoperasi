@@ -343,7 +343,12 @@ const menuGroups = [
         icon: AjukanPinjamanIcon,
         name: "Ajukan Pinjaman",
         path: "/pengajuan-pinjaman",
-      }
+      },
+      {
+        icon: ListIcon,
+        name: "List Angsuran",
+        path: "/ListAngsuran",
+      },
     ]
   }
 ];

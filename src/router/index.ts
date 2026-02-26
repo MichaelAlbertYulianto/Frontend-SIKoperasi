@@ -322,6 +322,16 @@ const router = createRouter({
         roles: ['bendahara'],
       },
     },
+    {
+      path: '/ListAngsuran',
+      name: 'List Angsuran',
+      component: () => import('../views/Pages/ListAngsuran.vue'),
+      meta: {
+        title: 'List Angsuran',
+        requiresAuth: true,
+        roles: ['karyawan'],
+      },
+    },
 
     // {
     //   path: '/signin',

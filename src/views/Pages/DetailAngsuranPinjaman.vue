@@ -2,8 +2,7 @@
   <AdminLayout>
     <PageBreadcrumb :pageTitle="currentPageTitle" />
     <div
-      class="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12"
-    >
+      class="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
       <div class="mx-auto w-full max-w-4xl">
         <h3 class="mb-6 text-2xl font-semibold text-gray-800 dark:text-white/90">
           Detail Angsuran Pinjaman
@@ -46,14 +45,10 @@
               <p>Jadwal angsuran belum tersedia atau pinjaman belum dicairkan.</p>
             </div>
 
-            <vue-good-table
-              v-else
-              :columns="angsuranColumns"
-              :rows="angsuranList"
+            <vue-good-table v-else :columns="dynamicColumns" :rows="angsuranList"
               :pagination-options="{ enabled: false }"
               :sort-options="{ initialSortBy: [{ field: 'angsuran_ke', type: 'asc' }] }"
-              style-class="vgt-table striped bordered"
-            >
+              style-class="vgt-table striped bordered">
               <template #table-row="props">
                 <span v-if="props.column.field === 'angsuran_ke'">
                   Bulan ke-{{ props.row.angsuran_ke }}
@@ -79,17 +74,18 @@
                       class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-success-600 rounded hover:bg-success-700 transition shadow-sm">
                       Bayar
                     </button>
-
                     <button v-if="props.row.angsuran_ke < pinjamanDetail.tenor"
                       @click="prosesAngsuran(props.row, 'tunda')"
                       class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-warning-600 rounded hover:bg-warning-700 transition shadow-sm">
                       Tunda
                     </button>
                   </div>
-                  
+
                   <div v-else>
-                    <span v-if="props.row.status_angsuran === 'lunas'" class="text-xs text-success-600 font-medium">Selesai</span>
-                    <span v-else-if="props.row.status_angsuran === 'ditunda'" class="text-xs text-error-500 font-medium italic">Ditunda</span>
+                    <span v-if="props.row.status_angsuran === 'lunas'"
+                      class="text-xs text-success-600 font-medium">Selesai</span>
+                    <span v-else-if="props.row.status_angsuran === 'ditunda'"
+                      class="text-xs text-error-500 font-medium italic">Ditunda</span>
                     <span v-else class="text-xs text-gray-400 italic">Menunggu</span>
                   </div>
                 </span>
@@ -112,7 +108,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, h, onUnmounted } from "vue";
+import { ref, onMounted, h, onUnmounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
@@ -132,6 +128,9 @@ const angsuranList = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 const userToken = localStorage.getItem('user_token');
+const currentUserRole = ref(localStorage.getItem('user_role'));
+
+
 
 const DetailItem = {
   props: ['label', 'value'],
@@ -140,25 +139,36 @@ const DetailItem = {
       class: 'flex justify-between py-1 border-b border-gray-200 dark:border-gray-700 last:border-b-0'
     }, [
       h('span', { class: 'text-sm font-medium text-gray-600 dark:text-gray-400' }, props.label),
-      h('span', { class: 'text-sm font-semibold text-gray-900 dark:text-white' }, 
+      h('span', { class: 'text-sm font-semibold text-gray-900 dark:text-white' },
         slots.value ? slots.value() : props.value
       )
     ]);
   }
 };
 
-const angsuranColumns = ref([
-  { label: 'Bulan Ke', field: 'angsuran_ke', type: 'number' },
-  { label: 'Jatuh Tempo', field: 'tanggal_jatuh_tempo' },
-  { label: 'Tagihan', field: 'jumlah_tertagih', type: 'number' },
-  { label: 'Terbayar', field: 'jumlah_terbayar', type: 'number' },
-  { label: 'Sisa Tagihan', field: 'sisa_tagihan', type: 'number' },
-  { label: 'Status', field: 'status_angsuran' },
-  { label: 'Aksi', field: 'actions', sortable: false },
-]);
+const dynamicColumns = computed(() => {
+  const baseColumns = [
+    { label: 'Bulan Ke', field: 'angsuran_ke', type: 'number' },
+    { label: 'Jatuh Tempo', field: 'tanggal_jatuh_tempo' },
+    { label: 'Tagihan', field: 'jumlah_tertagih', type: 'number' },
+    { label: 'Terbayar', field: 'jumlah_terbayar', type: 'number' },
+    { label: 'Sisa Tagihan', field: 'sisa_tagihan', type: 'number' },
+    { label: 'Status', field: 'status_angsuran' },
+  ];
+
+  if (currentUserRole.value?.toLowerCase() === 'bendahara') {
+    baseColumns.push({ label: 'Aksi', field: 'actions', sortable: false });
+  }
+
+  return baseColumns;
+});
 
 const isBarisAktif = (row) => {
-  const barisTarget = angsuranList.value.find(item => 
+  const isBendahara = currentUserRole.value?.toLowerCase() === 'bendahara';
+
+  if (!isBendahara) return false;
+
+  const barisTarget = angsuranList.value.find(item =>
     item.status_angsuran !== 'lunas' && item.status_angsuran !== 'ditunda'
   );
   return barisTarget && barisTarget.id_jadwal === row.id_jadwal;
@@ -194,8 +204,8 @@ const formatStatusAngsuran = (status) => {
 };
 
 const statusClass = (status) => {
-  return status === 'dicairkan' 
-    ? 'inline-flex items-center rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-800' 
+  return status === 'dicairkan'
+    ? 'inline-flex items-center rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-800'
     : 'inline-flex items-center rounded-full bg-warning-100 px-2 py-0.5 text-xs font-medium text-warning-800';
 };
 
@@ -209,7 +219,7 @@ const fetchAngsuranDetails = async () => {
   isLoading.value = true;
   try {
     const headers = { 'ngrok-skip-browser-warning': '69420', 'Authorization': `Bearer ${userToken}` };
-    
+
     const [pinjamanRes, angsuranRes] = await Promise.all([
       axios.get(`${API_BASE_URL}/pinjaman/pinjaman/${pinjamanId.value}`, { headers }),
       axios.get(`${API_BASE_URL}/angsuran/pinjaman/${pinjamanId.value}`, { headers })
@@ -250,11 +260,11 @@ const prosesAngsuran = async (row, tipe) => {
     isLoading.value = true;
     try {
       const endpoint = isBayar ? '/angsuran/bayar' : '/angsuran/tunda';
-      await axios.post(`${API_BASE_URL}${endpoint}`, 
+      await axios.post(`${API_BASE_URL}${endpoint}`,
         { id_jadwal: row.id_jadwal },
         { headers: { 'Authorization': `Bearer ${userToken}` } }
       );
-      
+
       Swal.fire('Berhasil!', `Angsuran telah ${isBayar ? 'dibayar' : 'ditunda'}.`, 'success');
       fetchAngsuranDetails();
     } catch (err) {
