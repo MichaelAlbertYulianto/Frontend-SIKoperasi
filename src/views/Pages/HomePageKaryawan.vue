@@ -38,8 +38,8 @@
                         :search-options="{ enabled: true, placeholder: 'Cari jenis simpanan...' }" :pagination-options="{
                             enabled: true,
                             mode: 'records',
-                            perPage: 10,
-                            perPageDropdown: [10, 20],
+                            perPage: 5,
+                            perPageDropdown: [5, 10, 20],
                         }">
                         <template #table-row="props">
                             <span v-if="props.column.field === 'jumlah'">
