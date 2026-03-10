@@ -68,9 +68,11 @@
                           Keep me logged in
                         </label>
                       </div>
-                      <router-link to="/reset-password"
-                        class="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400">Forgot
-                        password?</router-link>
+                      <a href="https://wa.me/6285843203226?text=Halo%20Admin%2C%20saya%20lupa%20password%20akun%20SIKoperasi%20saya.%20Mohon%20bantuannya."
+                        target="_blank"
+                        class="text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-brand-400 transition-colors">
+                        Forgot password?
+                      </a>
                     </div>
                     <div>
                       <button type="submit"
@@ -100,7 +102,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios, { AxiosError } from 'axios' 
+import axios, { AxiosError } from 'axios'
 import FullScreenLayout from '@/components/layout/FullScreenLayout.vue'
 import Swal from 'sweetalert2'
 
@@ -113,83 +115,83 @@ const showPassword = ref(false)
 const keepLoggedIn = ref(false)
 
 const togglePasswordVisibility = () => {
-    showPassword.value = !showPassword.value
+  showPassword.value = !showPassword.value
 }
 
 const handleSubmit = async () => {
-    if (!API_BASE_URL) {
-        console.log('VITE_API_BASE_URL is not defined in .env file.')
-        return
+  if (!API_BASE_URL) {
+    console.log('VITE_API_BASE_URL is not defined in .env file.')
+    return
+  }
+
+  try {
+    const requestBody = {
+      username: username.value,
+      password: password.value,
+      keep_sign: keepLoggedIn.value,
     }
 
-    try {
-        const requestBody = {
-            username: username.value,
-            password: password.value,
-            keep_sign: keepLoggedIn.value,
-        }
+    const response = await axios.post(`${API_BASE_URL}/auth/login`, requestBody)
+    const getNama = await axios.get(`${API_BASE_URL}/user/profile`, {
+      headers: {
+        'ngrok-skip-browser-warning': '69420',
+        'Authorization': `Bearer ${response.data.user_token}`
+      }
+    })
+    const userToken = response.data.user_token
+    const userName = username.value
+    const userRole = response.data.role
+    const nama_karyawan = getNama.data.data.nama_karyawan
+    const id_user = getNama.data.data.id_user
 
-        const response = await axios.post(`${API_BASE_URL}/auth/login`, requestBody)
-        const getNama = await axios.get(`${API_BASE_URL}/user/profile`, {
-            headers: {
-                'ngrok-skip-browser-warning': '69420',
-                'Authorization': `Bearer ${response.data.user_token}`
-            }
-        })
-        const userToken = response.data.user_token
-        const userName = username.value
-        const userRole = response.data.role  
-        const nama_karyawan = getNama.data.data.nama_karyawan
-        const id_user = getNama.data.data.id_user
-        
-        localStorage.setItem('nama_karyawan', nama_karyawan)
-        localStorage.setItem('user_token', userToken)
-        localStorage.setItem('user_name', userName)
-        localStorage.setItem('user_role', userRole)
-        localStorage.setItem('current_user_id', id_user)
+    localStorage.setItem('nama_karyawan', nama_karyawan)
+    localStorage.setItem('user_token', userToken)
+    localStorage.setItem('user_name', userName)
+    localStorage.setItem('user_role', userRole)
+    localStorage.setItem('current_user_id', id_user)
 
-        
-        if (userRole === 'admin' || userRole === 'ketua' || userRole === 'sekretaris' || userRole === 'bendahara') {
-            router.push('/dashboard') 
-            return
-        } else {
-            router.push('/homepage') 
-            return
-        }
 
-    } catch (error) {
-        let errorMessage = 'Terjadi kesalahan jaringan atau server.'
-
-        if (axios.isAxiosError(error)) {
-            const axiosError = error as AxiosError;
-            
-            const responseData = axiosError.response?.data as { message?: string } | undefined;
-            
-            if (responseData && responseData.message) {
-                 errorMessage = responseData.message;
-            } else if (axiosError.response) {
-                errorMessage = `Gagal Login. Status: ${axiosError.response.status}`;
-            } else if (axiosError.request) {
-                errorMessage = 'Tidak ada respons dari server.';
-            } else {
-                errorMessage = axiosError.message;
-            }
-            
-            console.error('Login Gagal (Axios):', axiosError.response?.data || axiosError.message)
-
-        } else if (error instanceof Error) {
-            errorMessage = error.message;
-            console.error('Login Gagal (JS Error):', error.message)
-
-        } else {
-            console.error('Login Gagal (Unknown Error):', error)
-        }
-        
-        Swal.fire({
-            icon: 'error',
-            title: 'Login Gagal',
-            text: errorMessage,
-        })
+    if (userRole === 'admin' || userRole === 'ketua' || userRole === 'sekretaris' || userRole === 'bendahara') {
+      router.push('/dashboard')
+      return
+    } else {
+      router.push('/homepage')
+      return
     }
+
+  } catch (error) {
+    let errorMessage = 'Terjadi kesalahan jaringan atau server.'
+
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+
+      const responseData = axiosError.response?.data as { message?: string } | undefined;
+
+      if (responseData && responseData.message) {
+        errorMessage = responseData.message;
+      } else if (axiosError.response) {
+        errorMessage = `Gagal Login. Status: ${axiosError.response.status}`;
+      } else if (axiosError.request) {
+        errorMessage = 'Tidak ada respons dari server.';
+      } else {
+        errorMessage = axiosError.message;
+      }
+
+      console.error('Login Gagal (Axios):', axiosError.response?.data || axiosError.message)
+
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+      console.error('Login Gagal (JS Error):', error.message)
+
+    } else {
+      console.error('Login Gagal (Unknown Error):', error)
+    }
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Login Gagal',
+      text: errorMessage,
+    })
+  }
 }
 </script>
