@@ -7,7 +7,7 @@
 
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="font-semibold text-gray-800 text-xl dark:text-white/90">
-                        Riwayat Pinjaman Saya
+                        Pinjaman Yang Sedang Diproses/Berjalan
                     </h3>
                     <button @click="openLoanModal"
                         class="px-4 py-2 text-sm font-medium text-white transition rounded-lg bg-brand-500 hover:bg-brand-600">
