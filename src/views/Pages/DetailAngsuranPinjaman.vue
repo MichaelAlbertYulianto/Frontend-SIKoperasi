@@ -45,7 +45,7 @@
               <p>Jadwal angsuran belum tersedia atau pinjaman belum dicairkan.</p>
             </div>
 
-            <vue-good-table v-else :columns="dynamicColumns" :rows="angsuranList"
+            <vue-good-table v-else :columns="dynamicColumns" :rows="angsuranList" :theme="isDarkMode ? 'nocturnal' : 'polar-bear'"
               :pagination-options="{ enabled: false }"
               :sort-options="{ initialSortBy: [{ field: 'angsuran_ke', type: 'asc' }] }"
               style-class="vgt-table striped bordered">
