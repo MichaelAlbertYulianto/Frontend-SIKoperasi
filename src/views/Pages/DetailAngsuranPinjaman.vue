@@ -121,7 +121,7 @@ const route = useRoute();
 const router = useRouter();
 
 const pinjamanId = ref(route.params.id);
-const currentPageTitle = ref(`Detail Angsuran: ${pinjamanId.value.substring(0, 8)}...`);
+const currentPageTitle = ref(`Detail Angsuran`);
 
 const pinjamanDetail = ref({});
 const angsuranList = ref([]);
