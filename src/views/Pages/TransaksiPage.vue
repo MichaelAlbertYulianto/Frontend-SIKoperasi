@@ -11,7 +11,7 @@
           Memantau arus kas masuk dan keluar koperasi secara real-time.
         </p>
       </div>
-      <div class="mb-4 justify-end flex">
+      <div v-if="currentRole === 'bendahara'" class="mb-4 justify-end flex">
         <button @click="openAddExpenseModal"
           class="flex items-center justify-center gap-2 rounded-lg bg-error-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-error-700">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -108,6 +108,7 @@ const transaksiList = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 const isDarkMode = ref(false);
+const currentRole = localStorage.getItem("user_role");
 
 const columns = ref([
   { label: "Tanggal", field: "tanggal", sortable: true },

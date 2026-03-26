@@ -368,8 +368,11 @@ const filteredMenuGroups = computed(() => {
             } else if (group.title === "Karyawan Menu") {
                 const allowed = ['karyawan'];
                 isGroupVisible = isAllowed(userRole.value, allowed);
-            } else if (group.title === "Pencairan & Pelunasan" || group.title === "Iuran Anggota" || group.title === "Transaksi") {
+            } else if (group.title === "Pencairan & Pelunasan" || group.title === "Iuran Anggota") {
                 const allowed = ['bendahara'];
+                isGroupVisible = isAllowed(userRole.value, allowed);
+            } else if (group.title === "Transaksi") {
+                const allowed = ['bendahara', 'ketua', 'sekretaris'];
                 isGroupVisible = isAllowed(userRole.value, allowed);
             }
 

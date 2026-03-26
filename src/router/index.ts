@@ -319,7 +319,7 @@ const router = createRouter({
       meta: {
         title: 'Transaksi',
         requiresAuth: true,
-        roles: ['bendahara'],
+        roles: ['bendahara', 'ketua', 'sekretaris'],
       },
     },
     {
