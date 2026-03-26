@@ -19,7 +19,7 @@
         !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start',
       ]"
     >
-      <router-link to="/dashboard">
+      <router-link to="/">
         <img
           v-if="isExpanded || isHovered || isMobileOpen"
           class="dark:hidden"
@@ -359,8 +359,8 @@ const filteredMenuGroups = computed(() => {
         .map(group => {
             let isGroupVisible = false;
 
-            if (group.title === "Menu Pengurus") {
-                const allowed = ['ketua', 'bendahara', 'sekretaris', 'admin'];
+            if (group.title === "Menu Pengurus"|| group.title === "Transaksi") {
+                const allowed = ['ketua', 'bendahara', 'sekretaris'];
                 isGroupVisible = isAllowed(userRole.value, allowed);
             } else if (group.title === "Administration") {
                 const allowed = ['admin'];
@@ -370,9 +370,6 @@ const filteredMenuGroups = computed(() => {
                 isGroupVisible = isAllowed(userRole.value, allowed);
             } else if (group.title === "Pencairan & Pelunasan" || group.title === "Iuran Anggota") {
                 const allowed = ['bendahara'];
-                isGroupVisible = isAllowed(userRole.value, allowed);
-            } else if (group.title === "Transaksi") {
-                const allowed = ['bendahara', 'ketua', 'sekretaris'];
                 isGroupVisible = isAllowed(userRole.value, allowed);
             }
 

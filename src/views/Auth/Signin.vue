@@ -151,8 +151,11 @@ const handleSubmit = async () => {
     localStorage.setItem('current_user_id', id_user)
 
 
-    if (userRole === 'admin' || userRole === 'ketua' || userRole === 'sekretaris' || userRole === 'bendahara') {
+    if (userRole === 'ketua' || userRole === 'sekretaris' || userRole === 'bendahara') {
       router.push('/dashboard')
+      return
+    } else if (userRole === 'admin') {
+      router.push('/users-management')
       return
     } else {
       router.push('/homepage')

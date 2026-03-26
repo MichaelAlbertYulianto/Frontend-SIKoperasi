@@ -32,7 +32,7 @@ const router = createRouter({
       meta: {
         title: 'Dashboard',
         requiresAuth: true,
-        roles: ['admin', 'ketua', 'sekretaris', 'bendahara'],
+        roles: ['ketua', 'sekretaris', 'bendahara'],
       },
     },
     {
@@ -199,7 +199,7 @@ const router = createRouter({
       meta: {
         title: 'Pendingan Pinjaman',
         requiresAuth: true,
-        roles: ['admin', 'ketua', 'sekretaris', 'bendahara'],
+        roles: ['ketua', 'sekretaris', 'bendahara'],
       },
     },
     {
@@ -249,7 +249,7 @@ const router = createRouter({
       meta: {
         title: 'History Pinjaman',
         requiresAuth: true,
-        roles: ['admin', 'ketua', 'sekretaris', 'bendahara'],
+        roles: ['ketua', 'sekretaris', 'bendahara'],
       },
     },
     {
@@ -375,6 +375,8 @@ router.beforeEach((to, from, next) => {
     if (isAuthRoute) {
       if (userRole === 'karyawan') {
         next({ name: 'Homepage' })
+      }else if (userRole === 'admin') {
+        next({ name: 'Users Management' })
       } else {
         next({ name: 'Dashboard' })
       }
@@ -385,7 +387,14 @@ router.beforeEach((to, from, next) => {
   const targetIsRoot = to.path === '/' 
   const targetHasNoRoles = requiredAuth && requiredRoles.length === 0 
 
-  const defaultHome = userRole === 'karyawan' ? 'Homepage' : 'Dashboard'
+let defaultHome = 'Dashboard' 
+  if (userRole === 'karyawan') {
+    defaultHome = 'Homepage'
+  } else if (userRole === 'admin') {
+    defaultHome = 'Users Management'
+  } else if (userRole === 'bendahara') {
+    defaultHome = 'Dashboard'
+  }
 
   if (targetIsRoot || targetHasNoRoles) {
     if (to.name !== defaultHome) {
