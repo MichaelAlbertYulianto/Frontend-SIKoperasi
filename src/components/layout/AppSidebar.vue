@@ -360,7 +360,7 @@ const filteredMenuGroups = computed(() => {
             let isGroupVisible = false;
 
             if (group.title === "Menu Pengurus"|| group.title === "Transaksi") {
-                const allowed = ['ketua', 'bendahara', 'sekretaris'];
+                const allowed = ['ketua', 'bendahara', 'sekretaris', 'admin'];
                 isGroupVisible = isAllowed(userRole.value, allowed);
             } else if (group.title === "Administration") {
                 const allowed = ['admin'];

@@ -32,7 +32,7 @@ const router = createRouter({
       meta: {
         title: 'Dashboard',
         requiresAuth: true,
-        roles: ['ketua', 'sekretaris', 'bendahara'],
+        roles: ['ketua', 'sekretaris', 'bendahara', 'admin'],
       },
     },
     {
@@ -199,7 +199,7 @@ const router = createRouter({
       meta: {
         title: 'Pendingan Pinjaman',
         requiresAuth: true,
-        roles: ['ketua', 'sekretaris', 'bendahara'],
+        roles: ['ketua', 'sekretaris', 'bendahara', 'admin'],
       },
     },
     {
@@ -249,7 +249,7 @@ const router = createRouter({
       meta: {
         title: 'History Pinjaman',
         requiresAuth: true,
-        roles: ['ketua', 'sekretaris', 'bendahara'],
+        roles: ['ketua', 'sekretaris', 'bendahara', 'admin'],
       },
     },
     {
@@ -258,6 +258,16 @@ const router = createRouter({
       component: () => import('../views/Pages/HomePageKaryawan.vue'),
       meta: {
         title: 'Homepage',
+        requiresAuth: true,
+        roles: ['karyawan'],
+      },
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: () => import('../views/Pages/AccountSettings.vue'),
+      meta: {
+        title: 'Settings',
         requiresAuth: true,
         roles: ['karyawan'],
       },
@@ -289,7 +299,7 @@ const router = createRouter({
       meta: {
         title: 'Pinjaman Aktif',
         requiresAuth: true,
-        roles: ['bendahara'],
+        roles: ['bendahara', 'admin'],
       },
     },
     {
@@ -299,7 +309,7 @@ const router = createRouter({
       meta: {
         title: 'Detail Angsuran',
         requiresAuth: true,
-        roles: ['bendahara', 'karyawan'],
+        roles: ['bendahara', 'karyawan', 'admin'],
       },
     },
     {
@@ -319,7 +329,7 @@ const router = createRouter({
       meta: {
         title: 'Transaksi',
         requiresAuth: true,
-        roles: ['bendahara', 'ketua', 'sekretaris'],
+        roles: ['bendahara', 'ketua', 'sekretaris', 'admin'],
       },
     },
     {
@@ -391,7 +401,7 @@ let defaultHome = 'Dashboard'
   if (userRole === 'karyawan') {
     defaultHome = 'Homepage'
   } else if (userRole === 'admin') {
-    defaultHome = 'Users Management'
+    defaultHome = 'Dashboard'
   } else if (userRole === 'bendahara') {
     defaultHome = 'Dashboard'
   }

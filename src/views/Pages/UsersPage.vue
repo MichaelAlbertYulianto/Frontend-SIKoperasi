@@ -60,8 +60,8 @@
               {{ props.formattedRow['nama_karyawan'] }}
             </span>
             <span v-else-if="props.column.field === 'aksi'">
-              <button @click="viewDetail(props.row)"
-                class="text-brand-500 hover:text-brand-600 dark:text-brand-400 font-medium">
+              <button  @click="viewDetail(props.row)"
+                class="bg-brand-500 hover:bg-brand-600 text-white text-xs py-1.5 px-3 rounded-md transition-colors font-medium shadow-sm">
                 Edit
               </button>
             </span>
