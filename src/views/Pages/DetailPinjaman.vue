@@ -96,7 +96,7 @@
                 aktif."
               </p>
               <p class="mb-4 text-sm text-gray-500">Total: {{ riwayatPinjaman.length }} Pengajuan Tercatat</p>
-              <vue-good-table :columns="historyColumns" :rows="riwayatPinjaman" :pagination-options="{
+              <vue-good-table :columns="historyColumns" :rows="riwayatPinjaman" :theme="isDarkMode ? 'nocturnal' : 'polar-bear'" :pagination-options="{
                 enabled: true,
                 perPage: 3,
                 perPageDropdown: [3, 5, 10],
@@ -173,7 +173,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import PageBreadcrumb from "@/components/common/PageBreadcrumb.vue";
@@ -495,8 +495,32 @@ const orderedPersetujuan = computed(() => {
   return sortedList;
 });
 
+const isDarkMode = ref(false);
+
+const updateTheme = () => {
+  isDarkMode.value = document.documentElement.classList.contains("dark");
+};
+
+let themeObserver;
+
+
 onMounted(() => {
   fetchPinjamanDetail();
+  updateTheme();
+  themeObserver = new MutationObserver(() => {
+    updateTheme();
+  });
+
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+});
+
+onUnmounted(() => {
+  if (themeObserver) {
+    themeObserver.disconnect();
+  }
 });
 </script>
 
